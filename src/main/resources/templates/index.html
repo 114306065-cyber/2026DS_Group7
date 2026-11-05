@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MovieFinder</title>
+</head>
+<body>
+    <h1>MovieFinder</h1>
+    <form th:action="@{/search}" method="get">
+        <input type="search" name="q" placeholder="cat, cooking, friendship..." required autofocus>
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>

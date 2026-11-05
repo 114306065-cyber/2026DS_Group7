@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MovieFinder results</title>
+</head>
+<body>
+    <p><a th:href="@{/}">MovieFinder</a></p>
+    <h1>Results for "<span th:text="${q}">cat</span>"</h1>
+    <p><a th:href="@{/compare(q=${q})}">Compare with Google</a></p>
+
+    <p th:if="${results.isEmpty()}">No results found.</p>
+
+    <ol>
+        <li th:each="r : ${results}">
+            <a th:href="${r.url}" th:text="${r.title}" rel="noopener noreferrer">Title</a>
+            <span th:text="${#numbers.formatDecimal(r.score, 1, 1)}">0.0</span>
+            <ul>
+                <li th:each="b : ${r.breakdown}">
+                    <span th:text="${b.key}">keyword</span>:
+                    <span th:text="${#numbers.formatDecimal(b.value, 1, 1)}">0.0</span>
+                </li>
+            </ul>
+            <details>
+                <summary>Subpage tree</summary>
+                <ul th:insert="~{result :: tree(${r.tree.root})}"></ul>
+            </details>
+        </li>
+    </ol>
+
+    <!-- Recursive fragment: renders one WebNode and then its children. -->
+    <th:block th:if="${false}">
+        <li th:fragment="tree(node)">
+            <a th:href="${node.webPage.url}" th:text="${node.webPage.title}" rel="noopener noreferrer">Page</a>
+            <span th:text="${#numbers.formatDecimal(node.nodeScore, 1, 1)}">0.0</span>
+            <span th:text="${node.webPage.counts}">{}</span>
+            <ul th:unless="${node.children.isEmpty()}">
+                <th:block th:each="child : ${node.children}">
+                    <th:block th:insert="~{result :: tree(${child})}"></th:block>
+                </th:block>
+            </ul>
+        </li>
+    </th:block>
+</body>
+</html>

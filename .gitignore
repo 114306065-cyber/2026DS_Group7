@@ -1,3 +1,19 @@
 .DS_Store
 .Rhistory
 *.class
+
+# Build output
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Secrets: never commit an API key
+.env
+*.local.properties
