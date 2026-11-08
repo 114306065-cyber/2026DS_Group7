@@ -10,10 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Member E: remove this line once GoogleQuery is implemented (HW8)")
 class GoogleQueryTest {
 
     private static String sample() throws IOException {
@@ -48,5 +46,28 @@ class GoogleQueryTest {
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> new GoogleQuery("", 20).query("cat"));
 
         assertTrue(e.getMessage().contains("TAVILY_API_KEY"));
+    }
+
+    @Test
+    void parseKeepsTheFirstOfDuplicateUrlsAndFallsBackToTheUrlAsTitle() {
+        String json = "{\"results\":[{\"title\":\"First\",\"url\":\"https://a.example\"},"
+                + "{\"title\":\"Again\",\"url\":\"https://a.example\"},{\"url\":\"https://b.example\"}]}";
+
+        LinkedHashMap<String, String> results = new GoogleQuery("key", 20).parse(json);
+
+        assertEquals("First", results.get("https://a.example"));
+        assertEquals("https://b.example", results.get("https://b.example"));
+    }
+
+    @Test
+    void parseRejectsInvalidJson() {
+        assertThrows(IllegalArgumentException.class, () -> new GoogleQuery("key", 20).parse("<html>"));
+    }
+
+    @Test
+    void errorMessagesExplainCommonTavilyFailures() {
+        assertTrue(GoogleQuery.describeError(401).contains("TAVILY_API_KEY"));
+        assertTrue(GoogleQuery.describeError(432).contains("limit"));
+        assertTrue(GoogleQuery.describeError(500).contains("500"));
     }
 }

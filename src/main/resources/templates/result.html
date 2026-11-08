@@ -1,41 +1,72 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MovieFinder results</title>
-</head>
+<html th:lang="${#locale.language == 'zh'} ? 'zh-Hant' : 'en'" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{result.title(${q})})}"></head>
 <body>
-    <p><a th:href="@{/}">MovieFinder</a></p>
-    <h1>Results for "<span th:text="${q}">cat</span>"</h1>
-    <p><a th:href="@{/compare(q=${q})}">Compare with Tavily</a></p>
+    <header class="topbar">
+        <a th:replace="~{fragments :: logo}"></a>
+        <form th:replace="~{fragments :: searchForm}"></form>
+        <a th:replace="~{fragments :: langToggle('/search')}"></a>
+    </header>
 
-    <p th:if="${results.isEmpty()}">No results found.</p>
+    <main class="page">
+        <div class="page-head">
+            <h1 th:text="#{result.heading(${q})}">Results for “cat”</h1>
+            <a class="text-link" th:href="@{/compare(q=${q})}" th:text="#{result.compare}">Compare with Tavily</a>
+        </div>
 
-    <ol>
-        <li th:each="r : ${results}">
-            <a th:href="${r.url}" th:text="${r.title}" rel="noopener noreferrer">Title</a>
-            <span th:text="${#numbers.formatDecimal(r.score, 1, 1)}">0.0</span>
-            <ul>
-                <li th:each="b : ${r.breakdown}">
-                    <span th:text="${b.key}">keyword</span>:
-                    <span th:text="${#numbers.formatDecimal(b.value, 1, 1)}">0.0</span>
+        <p class="empty" th:if="${results.isEmpty()}" th:text="#{result.none}">No results found.</p>
+
+        <ol class="tickets" th:unless="${results.isEmpty()}">
+            <li class="ticket" th:each="r : ${results}">
+                <div class="ticket-main">
+                    <a class="ticket-title" th:href="${r.url}" th:text="${r.title}"
+                       target="_blank" rel="noopener noreferrer">Title</a>
+                    <p class="ticket-url" th:text="${r.url}">https://example.com</p>
+
+                    <!-- Score and breakdown appear once the full ranking is connected (hidden in HW8 mode). -->
+                    <div class="ticket-score" th:unless="${r.breakdown.isEmpty()}">
+                        <p class="score">
+                            <span th:text="#{ticket.score}">Score</span>
+                            <strong th:text="${#numbers.formatDecimal(r.score, 1, 1)}">0.0</strong>
+                        </p>
+                        <ul class="chips" th:attr="aria-label=#{ticket.breakdown}">
+                            <li th:each="b : ${r.breakdown}">
+                                <span th:text="${b.key}">keyword</span>
+                                <strong th:text="${#numbers.formatDecimal(b.value, 1, 1)}">0.0</strong>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Subpage tree appears once the crawler is connected (hidden in HW8 mode). -->
+                    <details class="subpages" th:unless="${r.tree.root.children.isEmpty()}">
+                        <summary th:text="#{ticket.subpages(${r.tree.root.children.size()})}">Subpages (5)</summary>
+                        <ul class="tree">
+                            <th:block th:each="child : ${r.tree.root.children}">
+                                <th:block th:insert="~{result :: tree(${child})}"></th:block>
+                            </th:block>
+                        </ul>
+                    </details>
+                </div>
+                <div class="ticket-stub">
+                    <span class="stub-label" th:text="#{ticket.no}">No.</span>
+                    <span class="stub-rank" th:text="${#numbers.formatInteger(r.rank, 2)}">01</span>
+                    <span class="stub-admit" th:text="#{ticket.admit}">Admit one</span>
+                </div>
+            </li>
+        </ol>
+    </main>
+
+    <!-- Recursive fragment: one subpage and then its own subpages. -->
+    <th:block th:if="${false}">
+        <li th:fragment="tree(node)" class="tree-node">
+            <a th:href="${node.webPage.url}" th:text="${node.webPage.title}" target="_blank" rel="noopener noreferrer">Page</a>
+            <span class="tree-score" th:text="${#numbers.formatDecimal(node.nodeScore, 1, 1)}">0.0</span>
+            <ul class="chips chips--small">
+                <li th:each="c : ${node.webPage.counts}" th:if="${c.value > 0}">
+                    <span th:text="${c.key}">keyword</span> <strong th:text="${c.value}">0</strong>
                 </li>
             </ul>
-            <details>
-                <summary>Subpage tree</summary>
-                <ul th:insert="~{result :: tree(${r.tree.root})}"></ul>
-            </details>
-        </li>
-    </ol>
-
-    <!-- Recursive fragment: renders one WebNode and then its children. -->
-    <th:block th:if="${false}">
-        <li th:fragment="tree(node)">
-            <a th:href="${node.webPage.url}" th:text="${node.webPage.title}" rel="noopener noreferrer">Page</a>
-            <span th:text="${#numbers.formatDecimal(node.nodeScore, 1, 1)}">0.0</span>
-            <span th:text="${node.webPage.counts}">{}</span>
-            <ul th:unless="${node.children.isEmpty()}">
+            <ul class="tree" th:unless="${node.children.isEmpty()}">
                 <th:block th:each="child : ${node.children}">
                     <th:block th:insert="~{result :: tree(${child})}"></th:block>
                 </th:block>
