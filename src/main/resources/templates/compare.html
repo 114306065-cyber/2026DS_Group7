@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MovieFinder compare</title>
+</head>
+<body>
+    <p><a th:href="@{/search(q=${q})}">Back to results</a></p>
+    <h1>Compare: "<span th:text="${q}">cat</span>"</h1>
+    <table>
+        <thead>
+            <tr><th>Tavily</th><th>MovieFinder</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <ol>
+                        <li th:each="g : ${google}">
+                            <a th:href="${g.key}" th:text="${g.value}" rel="noopener noreferrer">Title</a>
+                        </li>
+                    </ol>
+                </td>
+                <td>
+                    <ol>
+                        <li th:each="r : ${results}">
+                            <a th:href="${r.url}" th:text="${r.title}" rel="noopener noreferrer">Title</a>
+                        </li>
+                    </ol>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

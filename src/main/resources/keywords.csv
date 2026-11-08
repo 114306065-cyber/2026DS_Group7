@@ -1,0 +1,15 @@
+# keyword,weight  (Member A tunes these; see docs/TEAM_PLAN.md)
+# Positive = movie-related signal. Negative = ticketing or shopping noise.
+review,3
+影評,3
+director,2
+導演,2
+cast,2
+plot,2
+劇情,2
+movie,1
+film,1
+電影,1
+ticket,-1
+訂票,-1
+showtimes,-1
