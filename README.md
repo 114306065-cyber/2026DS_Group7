@@ -32,9 +32,22 @@ mock 模式只顯示假資料,不會執行後端組員的程式。後端的測�
 
 後端完成前,不加 mock profile 啟動的網站在搜尋時會回傳錯誤,這是正常的。
 
-## 使用真實搜尋
+## Tavily 金鑰
 
-先到 https://app.tavily.com 申請金鑰,格式類似 `tvly-xxxx`。
+**每個人用自己的金鑰。** 金鑰只設在自己電腦的環境變數裡,不寫進任何檔案,所以永遠不會被 commit,別人也拿不到。
+
+| 情況 | 需要金鑰嗎 |
+|---|---|
+| 跑測試(`./mvnw test`) | 不需要,測試不連網 |
+| mock 模式 | 不需要 |
+| 真實搜尋(hw8 模式、完整網站) | 需要自己的金鑰 |
+| 部署上線 | 設在雲端平台的環境變數,由 B 和全組決定用誰的金鑰 |
+
+申請方式:到 https://app.tavily.com 註冊,免費,不需要信用卡,格式類似 `tvly-xxxx`。免費方案每人每月 1,000 次,每個人各自申請,額度也是分開算的。
+
+**不要把金鑰貼到群組或 GitHub 上。** 如果不小心外流,到 Tavily 的 Dashboard 刪掉舊金鑰、建立新的。
+
+## 使用真實搜尋
 
 ```bash
 export TAVILY_API_KEY=你的金鑰
@@ -46,7 +59,7 @@ export TAVILY_API_KEY=你的金鑰
 ./mvnw spring-boot:run
 ```
 
-Windows 的 PowerShell 請用 `$env:TAVILY_API_KEY="你的金鑰"` 設定。
+Windows 的 PowerShell 請用 `$env:TAVILY_API_KEY="你的金鑰"` 設定。環境變數只對目前的終端機視窗有效,開新視窗要重新設定。
 
 **不要把 API key 寫進任何會 commit 的檔案。**
 
