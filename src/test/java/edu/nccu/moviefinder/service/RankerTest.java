@@ -13,7 +13,7 @@ import java.util.Random;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Member E: remove this line once Ranker.sort is implemented")
+@Disabled("Member C: remove this line once Ranker.sort is implemented")
 class RankerTest {
     private final Ranker ranker = new Ranker();
 

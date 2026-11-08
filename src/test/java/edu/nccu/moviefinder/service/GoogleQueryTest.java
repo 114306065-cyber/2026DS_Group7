@@ -13,11 +13,11 @@ import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-@Disabled("Member C: remove this line once GoogleQuery is implemented")
+@Disabled("Member E: remove this line once GoogleQuery is implemented (HW8)")
 class GoogleQueryTest {
 
     private static String sample() throws IOException {
-        try (InputStream in = GoogleQueryTest.class.getResourceAsStream("/serpapi-sample.json")) {
+        try (InputStream in = GoogleQueryTest.class.getResourceAsStream("/tavily-sample.json")) {
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
     }
@@ -32,14 +32,21 @@ class GoogleQueryTest {
     }
 
     @Test
-    void parseReturnsEmptyWhenThereAreNoOrganicResults() {
-        assertTrue(new GoogleQuery("key", 20).parse("{\"search_metadata\":{}}").isEmpty());
+    void parseReturnsEmptyWhenThereAreNoResults() {
+        assertTrue(new GoogleQuery("key", 20).parse("{\"query\":\"cat\"}").isEmpty());
+    }
+
+    @Test
+    void parseSkipsResultsWithoutAUrl() {
+        String json = "{\"results\":[{\"title\":\"No link\"},{\"title\":\"Ok\",\"url\":\"https://ok.example\"}]}";
+
+        assertEquals(List.of("https://ok.example"), new ArrayList<>(new GoogleQuery("key", 20).parse(json).keySet()));
     }
 
     @Test
     void aMissingApiKeyFailsWithAHelpfulMessage() {
         IllegalStateException e = assertThrows(IllegalStateException.class, () -> new GoogleQuery("", 20).query("cat"));
 
-        assertTrue(e.getMessage().contains("SERPAPI_KEY"));
+        assertTrue(e.getMessage().contains("TAVILY_API_KEY"));
     }
 }

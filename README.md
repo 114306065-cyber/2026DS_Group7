@@ -34,10 +34,19 @@ mock 模式只顯示假資料,不會執行後端組員的程式。後端的測�
 
 ## 使用真實搜尋
 
+先到 https://app.tavily.com 申請金鑰,格式類似 `tvly-xxxx`。
+
 ```bash
-export SERPAPI_KEY=你的金鑰
+export TAVILY_API_KEY=你的金鑰
+
+# HW8 版本:直接顯示 Tavily 結果(不計分)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=hw8
+
+# 完整版本:等 C 的搜尋流程完成後使用
 ./mvnw spring-boot:run
 ```
+
+Windows 的 PowerShell 請用 `$env:TAVILY_API_KEY="你的金鑰"` 設定。
 
 **不要把 API key 寫進任何會 commit 的檔案。**
 
@@ -61,7 +70,8 @@ export SERPAPI_KEY=你的金鑰
 src/main/java/edu/nccu/moviefinder/
 ├── controller/   SearchController
 ├── service/      SearchService, MockSearchService, KeywordExpander, GoogleQuery,
-│                 SubLinkCrawler, PagePrefetcher, WordCounter, Ranker
+│                 SubLinkCrawler, PagePrefetcher, WordCounter, Ranker,
+│                 Hw8SearchService(HW8 暫時版本)
 ├── model/        Keyword, KeywordList, WebPage, WebNode, WebTree, SearchResult
 └── cli/          StageDemo(Stage 1、2 展示)
 src/main/resources/

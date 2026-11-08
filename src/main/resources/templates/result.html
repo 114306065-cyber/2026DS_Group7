@@ -8,7 +8,7 @@
 <body>
     <p><a th:href="@{/}">MovieFinder</a></p>
     <h1>Results for "<span th:text="${q}">cat</span>"</h1>
-    <p><a th:href="@{/compare(q=${q})}">Compare with Google</a></p>
+    <p><a th:href="@{/compare(q=${q})}">Compare with Tavily</a></p>
 
     <p th:if="${results.isEmpty()}">No results found.</p>
 

@@ -1,8 +1,0 @@
-{
-  "search_metadata": { "status": "Success" },
-  "organic_results": [
-    { "position": 1, "title": "Best Cat Movies", "link": "https://a.example.com/cats" },
-    { "position": 2, "title": "Cats in Film", "link": "https://b.example.org/film" },
-    { "position": 3, "title": "Cat Movie Reviews", "link": "https://c.example.net/reviews" }
-  ]
-}

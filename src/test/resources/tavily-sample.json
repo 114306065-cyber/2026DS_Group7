@@ -1,0 +1,9 @@
+{
+  "query": "cat movie",
+  "results": [
+    { "title": "Best Cat Movies", "url": "https://a.example.com/cats", "content": "A list of cat movies.", "score": 0.91 },
+    { "title": "Cats in Film", "url": "https://b.example.org/film", "content": "Cats on screen.", "score": 0.85 },
+    { "title": "Cat Movie Reviews", "url": "https://c.example.net/reviews", "content": "Reviews.", "score": 0.80 }
+  ],
+  "response_time": 1.02
+}

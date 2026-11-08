@@ -13,7 +13,7 @@ public class Ranker {
      * 不可呼叫 Collections.sort / List.sort。
      */
     public void sort(List<WebTree> trees) {
-        // TODO(Member E, Stage 1)
-        throw new UnsupportedOperationException("TODO(Member E): Ranker.sort");
+        // TODO(Member C, Stage 1)
+        throw new UnsupportedOperationException("TODO(Member C): Ranker.sort");
     }
 }

@@ -59,7 +59,7 @@ public class SearchService {
         return new WebPage(url, title);
     }
 
-    /** 未經重新排序的 Google 結果(網址 → 標題),給 compare.html 使用。 */
+    /** 未經重新排序的搜尋引擎結果(網址 → 標題),給 compare.html 使用。 */
     public LinkedHashMap<String, String> googleResults(String q) throws IOException {
         return googleQuery.query(q);
     }
