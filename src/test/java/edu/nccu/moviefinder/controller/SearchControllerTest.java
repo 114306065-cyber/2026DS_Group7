@@ -51,4 +51,27 @@ class SearchControllerTest {
         mvc.perform(get("/search").param("q", "  "))
                 .andExpect(redirectedUrl("/"));
     }
+
+    @Test
+    void pagesAreEnglishByDefault() throws Exception {
+        mvc.perform(get("/"))
+                .andExpect(content().string(containsString(">Search<")))
+                .andExpect(content().string(containsString("lang=\"en\"")));
+    }
+
+    @Test
+    void languageCanBeSwitchedToChinese() throws Exception {
+        mvc.perform(get("/search").param("q", "cat").param("lang", "zh"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(">搜尋<")))
+                .andExpect(content().string(containsString("憑票入場")))
+                .andExpect(content().string(containsString("lang=\"zh-Hant\"")));
+    }
+
+    @Test
+    void searchShowsEachResultAsANumberedTicket() throws Exception {
+        mvc.perform(get("/search").param("q", "cat"))
+                .andExpect(content().string(containsString("class=\"stub-rank\">01<")))
+                .andExpect(content().string(containsString("class=\"stub-rank\">03<")));
+    }
 }

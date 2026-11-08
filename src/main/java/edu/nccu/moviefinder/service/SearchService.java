@@ -36,6 +36,8 @@ public class SearchService {
     /**
      * 回傳依分數排序的結果,rank 從 1 開始,最多跑 MAX_ROUND 輪。
      * 單一網站失敗時略過該網站,不可讓整次搜尋失敗。
+     * 搜尋引擎整個無法使用時(GoogleQuery 丟出 IOException 或 IllegalStateException),
+     * 丟出 SearchUnavailableException,讓介面顯示錯誤訊息而不是「沒有找到結果」。
      */
     public ArrayList<SearchResult> search(String q) {
         // TODO(Member C, Stage 3 → 4)

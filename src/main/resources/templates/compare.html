@@ -1,35 +1,49 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MovieFinder compare</title>
-</head>
+<html th:lang="${#locale.language == 'zh'} ? 'zh-Hant' : 'en'" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{compare.title(${q})})}"></head>
 <body>
-    <p><a th:href="@{/search(q=${q})}">Back to results</a></p>
-    <h1>Compare: "<span th:text="${q}">cat</span>"</h1>
-    <table>
-        <thead>
-            <tr><th>Tavily</th><th>MovieFinder</th></tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <ol>
-                        <li th:each="g : ${google}">
-                            <a th:href="${g.key}" th:text="${g.value}" rel="noopener noreferrer">Title</a>
-                        </li>
-                    </ol>
-                </td>
-                <td>
-                    <ol>
-                        <li th:each="r : ${results}">
-                            <a th:href="${r.url}" th:text="${r.title}" rel="noopener noreferrer">Title</a>
-                        </li>
-                    </ol>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <header class="topbar">
+        <a th:replace="~{fragments :: logo}"></a>
+        <form th:replace="~{fragments :: searchForm}"></form>
+        <a th:replace="~{fragments :: langToggle('/compare')}"></a>
+    </header>
+
+    <main class="page">
+        <div class="page-head">
+            <h1 th:text="#{compare.heading(${q})}">Compare “cat”</h1>
+            <a class="text-link" th:href="@{/search(q=${q})}" th:text="#{compare.back}">Back to results</a>
+        </div>
+
+        <div class="compare">
+            <section class="compare-col">
+                <h2 th:text="#{compare.tavily}">Tavily ranking</h2>
+                <p class="empty empty--small empty--error" th:if="${googleError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
+                <p class="empty empty--small" th:if="${google.isEmpty() and googleError == null}" th:text="#{compare.none}">No results.</p>
+                <ol class="compare-list" th:unless="${google.isEmpty()}">
+                    <li th:each="g, stat : ${google}">
+                        <span class="compare-rank" th:text="${#numbers.formatInteger(stat.count, 2)}">01</span>
+                        <div class="compare-text">
+                            <a th:href="${g.key}" th:text="${g.value}" target="_blank" rel="noopener noreferrer">Title</a>
+                            <p class="ticket-url" th:text="${g.key}">https://example.com</p>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+            <section class="compare-col compare-col--ours">
+                <h2 th:text="#{compare.ours}">MovieFinder ranking</h2>
+                <p class="empty empty--small empty--error" th:if="${resultsError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
+                <p class="empty empty--small" th:if="${results.isEmpty() and resultsError == null}" th:text="#{compare.none}">No results.</p>
+                <ol class="compare-list" th:unless="${results.isEmpty()}">
+                    <li th:each="r : ${results}">
+                        <span class="compare-rank" th:text="${#numbers.formatInteger(r.rank, 2)}">01</span>
+                        <div class="compare-text">
+                            <a th:href="${r.url}" th:text="${r.title}" target="_blank" rel="noopener noreferrer">Title</a>
+                            <p class="ticket-url" th:text="${r.url}">https://example.com</p>
+                        </div>
+                    </li>
+                </ol>
+            </section>
+        </div>
+    </main>
 </body>
 </html>

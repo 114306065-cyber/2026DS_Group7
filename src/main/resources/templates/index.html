@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>MovieFinder</title>
-</head>
-<body>
-    <h1>MovieFinder</h1>
-    <form th:action="@{/search}" method="get">
-        <input type="search" name="q" placeholder="cat, cooking, friendship..." required autofocus>
-        <button type="submit">Search</button>
-    </form>
+<html th:lang="${#locale.language == 'zh'} ? 'zh-Hant' : 'en'" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('MovieFinder')}"></head>
+<body class="home">
+    <div class="home-bar">
+        <a th:replace="~{fragments :: langToggle('/')}"></a>
+    </div>
+    <main class="hero">
+        <div class="marquee">
+            <h1 class="hero-title"><span aria-hidden="true">🎬</span> MovieFinder</h1>
+            <p class="hero-tagline" th:text="#{app.tagline}">Find movies by the themes you love</p>
+        </div>
+        <form th:replace="~{fragments :: searchForm}"></form>
+        <p class="hero-hint" th:text="#{home.hint}">Try a theme such as cat, cooking, friendship, or AI.</p>
+    </main>
+    <div class="seats" aria-hidden="true"></div>
 </body>
 </html>
