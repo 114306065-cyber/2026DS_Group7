@@ -11,15 +11,23 @@ public class SearchResult {
     /** 每個關鍵字貢獻的分數(含子網頁折扣後),全部加總必須等於 score。 */
     private final HashMap<String, Double> breakdown;
     private final WebTree tree;
+    /** 網頁摘要,沒有時為空字串。Tavily 回傳的 content 之後可以放在這裡。 */
+    private final String snippet;
 
     public SearchResult(int rank, String title, String url, double score,
                         HashMap<String, Double> breakdown, WebTree tree) {
+        this(rank, title, url, score, breakdown, tree, "");
+    }
+
+    public SearchResult(int rank, String title, String url, double score,
+                        HashMap<String, Double> breakdown, WebTree tree, String snippet) {
         this.rank = rank;
         this.title = title;
         this.url = url;
         this.score = score;
         this.breakdown = breakdown;
         this.tree = tree;
+        this.snippet = snippet == null ? "" : snippet;
     }
 
     public int getRank() {
@@ -44,5 +52,9 @@ public class SearchResult {
 
     public WebTree getTree() {
         return tree;
+    }
+
+    public String getSnippet() {
+        return snippet;
     }
 }

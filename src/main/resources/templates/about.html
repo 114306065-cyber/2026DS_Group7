@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html th:lang="${#locale.language == 'zh'} ? 'zh-Hant' : 'en'" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(#{about.title})}"></head>
+<body class="page-about">
+    <header th:replace="~{fragments :: siteHeader('/about', 'about')}"></header>
+
+    <main class="about-page">
+        <h1 th:text="#{about.title}">About MovieFinder</h1>
+        <p class="about-lead" th:text="#{about.lead}">MovieFinder is a theme-based movie search engine.</p>
+
+        <section class="panel">
+            <h2 th:text="#{about.how.title}">How ranking works</h2>
+            <ol class="steps">
+                <li th:each="i : ${#numbers.sequence(1, 5)}" th:text="#{${'about.how.step' + i}}">Step</li>
+            </ol>
+            <div class="formula">
+                <p>WebPage.score = Σ count(k<sub>i</sub>) × weight(k<sub>i</sub>)</p>
+                <p>WebNode.nodeScore = webPage.score + 0.5 × Σ child.nodeScore</p>
+                <p>WebTree.totalScore = root.nodeScore</p>
+            </div>
+        </section>
+
+        <div class="about-grid">
+            <section class="panel">
+                <h2 th:text="#{about.source.title}">Data source</h2>
+                <p th:text="#{about.source.body}">Search results come from the Tavily Search API.</p>
+            </section>
+            <section class="panel">
+                <h2 th:text="#{about.team.title}">Team</h2>
+                <p th:text="#{about.team.body}">Group 7, Data Structures, National Chengchi University, Fall 2026.</p>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

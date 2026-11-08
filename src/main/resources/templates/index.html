@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html th:lang="${#locale.language == 'zh'} ? 'zh-Hant' : 'en'" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('MovieFinder')}"></head>
-<body class="home">
-    <div class="home-bar">
-        <a th:replace="~{fragments :: langToggle('/')}"></a>
-    </div>
-    <main class="hero">
-        <div class="marquee">
-            <h1 class="hero-title"><span aria-hidden="true">🎬</span> MovieFinder</h1>
-            <p class="hero-tagline" th:text="#{app.tagline}">Find movies by the themes you love</p>
-        </div>
-        <form th:replace="~{fragments :: searchForm}"></form>
-        <p class="hero-hint" th:text="#{home.hint}">Try a theme such as cat, cooking, friendship, or AI.</p>
+<body class="page-home">
+    <header th:replace="~{fragments :: siteHeader('/', 'search')}"></header>
+
+    <main>
+        <section class="hero">
+            <svg th:replace="~{illustrations :: operaFacade}"></svg>
+            <svg th:replace="~{illustrations :: banner}"></svg>
+            <svg th:replace="~{illustrations :: filmStrip}"></svg>
+
+            <div class="hero-inner">
+                <svg th:replace="~{illustrations :: filmRibbon}"></svg>
+                <h1 class="hero-title">MovieFinder</h1>
+                <p class="hero-tagline"><span th:text="#{home.tagline}">Find movies by the themes you love</span></p>
+                <form th:replace="~{fragments :: searchForm('/search')}"></form>
+                <p class="hero-hint" th:text="#{home.hint}">Search for a theme, topic, mood, or any idea you are interested in.</p>
+                <div class="hero-compare">
+                    <a th:replace="~{fragments :: compareLink(#{home.compare})}"></a>
+                    <span class="hero-compare-note" th:text="#{home.compareNote}">See how MovieFinder ranks results differently from Tavily.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="themes" aria-labelledby="themes-title">
+            <div class="section-head">
+                <h2 id="themes-title" th:text="#{explore.title}">Explore by Theme</h2>
+                <p th:text="#{explore.subtitle}">Try one of these popular themes to discover movies.</p>
+            </div>
+            <ul class="theme-grid">
+                <li th:each="t : ${ {'animals','cooking','friendship','ai','romance','adventure'} }">
+                    <a class="theme-card" th:classappend="'theme-' + ${t}" th:href="@{/search(q=${t == 'ai' ? 'AI' : t})}">
+                        <span class="theme-name" th:text="#{${'theme.' + t}}">Animals</span>
+                        <svg th:replace="~{illustrations :: __${t}__}"></svg>
+                    </a>
+                </li>
+            </ul>
+        </section>
     </main>
-    <div class="seats" aria-hidden="true"></div>
 </body>
 </html>

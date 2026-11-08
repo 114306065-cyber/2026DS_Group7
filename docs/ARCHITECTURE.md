@@ -58,6 +58,8 @@ WebTree.totalScore = root.nodeScore
 | `WebPage` | 無 | 增加 `getContent()` | `deriveKeywords` 需要內文 |
 | `MockSearchService`、`StageDemo` | 無 | 新增 | 支援平行開發,以及 Stage 1、2 的命令列展示 |
 | `Hw8SearchService` | 無 | 新增(暫時) | HW8 要顯示真實結果,但完整流程還沒完成。C 的流程可用後刪除 |
+| `SearchResult` | 欄位:rank、title、url、score、breakdown、tree | 新增可省略的 `snippet` 欄位 | 結果頁要顯示網頁摘要。原本 6 個參數的建構子照常可用,摘要為空字串時頁面不顯示 |
+| `SearchService` | 無 | 新增 `relatedKeywords(q)`,目前回傳空清單 | 結果頁的 Related Keywords。由 C、D 接上 `deriveKeywords`,回傳空清單時頁面隱藏該區塊 |
 | `PagePrefetcher` | 無 | 新增 | 平行抓取需要獨立的位置,否則 B 要改 A 和 C 的檔案 |
 
 ## 已知風險
