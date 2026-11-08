@@ -14,7 +14,8 @@
             <a class="text-link" th:href="@{/compare(q=${q})}" th:text="#{result.compare}">Compare with Tavily</a>
         </div>
 
-        <p class="empty" th:if="${results.isEmpty()}" th:text="#{result.none}">No results found.</p>
+        <p class="empty empty--error" th:if="${searchError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
+        <p class="empty" th:if="${results.isEmpty() and searchError == null}" th:text="#{result.none}">No results found.</p>
 
         <ol class="tickets" th:unless="${results.isEmpty()}">
             <li class="ticket" th:each="r : ${results}">

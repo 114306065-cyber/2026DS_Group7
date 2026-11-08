@@ -17,7 +17,8 @@
         <div class="compare">
             <section class="compare-col">
                 <h2 th:text="#{compare.tavily}">Tavily ranking</h2>
-                <p class="empty empty--small" th:if="${google.isEmpty()}" th:text="#{compare.none}">No results.</p>
+                <p class="empty empty--small empty--error" th:if="${googleError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
+                <p class="empty empty--small" th:if="${google.isEmpty() and googleError == null}" th:text="#{compare.none}">No results.</p>
                 <ol class="compare-list" th:unless="${google.isEmpty()}">
                     <li th:each="g, stat : ${google}">
                         <span class="compare-rank" th:text="${#numbers.formatInteger(stat.count, 2)}">01</span>
@@ -30,7 +31,8 @@
             </section>
             <section class="compare-col compare-col--ours">
                 <h2 th:text="#{compare.ours}">MovieFinder ranking</h2>
-                <p class="empty empty--small" th:if="${results.isEmpty()}" th:text="#{compare.none}">No results.</p>
+                <p class="empty empty--small empty--error" th:if="${resultsError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
+                <p class="empty empty--small" th:if="${results.isEmpty() and resultsError == null}" th:text="#{compare.none}">No results.</p>
                 <ol class="compare-list" th:unless="${results.isEmpty()}">
                     <li th:each="r : ${results}">
                         <span class="compare-rank" th:text="${#numbers.formatInteger(r.rank, 2)}">01</span>

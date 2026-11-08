@@ -35,7 +35,7 @@ WebTree.totalScore = root.nodeScore
 這些約定會影響其他人的模組。要修改時請先在群組討論。
 
 1. **關鍵字清單是每次搜尋獨立的。** `SearchService` 是 Spring singleton,`KeywordList` 必須是區域變數,否則同時搜尋的使用者會互相污染。
-2. **單一失敗不可擴大。** 子網頁失敗時該頁算 0 分,網站失敗時略過該網站,都不可讓整次搜尋失敗。
+2. **單一失敗不可擴大。** 子網頁失敗時該頁算 0 分,網站失敗時略過該網站,都不可讓整次搜尋失敗。只有搜尋引擎整個無法使用時(沒有金鑰、Tavily 連不上),`search` 才丟出 `SearchUnavailableException`,介面會顯示「搜尋服務暫時無法使用」。
 3. **`breakdown` 加總必須等於 `score`。** 子網頁的貢獻要乘上折扣,深度為 d 的節點乘上 0.5^d。
 4. **`GoogleQuery` 回傳的順序就是搜尋引擎的排名。** 比較頁依賴這個順序,所以要用 `LinkedHashMap`。
 5. **使用者關鍵字的權重最高。** `keywords.csv` 和 `deriveKeywords` 的權重都必須低於 `KeywordList.USER_WEIGHT`。

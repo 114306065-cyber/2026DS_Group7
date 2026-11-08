@@ -33,7 +33,7 @@ public class Hw8SearchService extends SearchService {
 
     /**
      * 依 Tavily 的原順序回傳結果,rank 從 1 開始。分數為 0,breakdown 為空,樹只有根節點。
-     * 查詢失敗時回傳空的清單,讓頁面顯示「沒有找到結果」,原因寫在 log。
+     * Tavily 無法使用時丟出 SearchUnavailableException,原因寫在 log。
      */
     @Override
     public ArrayList<SearchResult> search(String q) {
@@ -43,7 +43,7 @@ public class Hw8SearchService extends SearchService {
             hits = googleQuery.query(q);
         } catch (IOException | IllegalStateException e) {
             log.warn("Tavily search failed: {}", e.getMessage());
-            return results;
+            throw new SearchUnavailableException("Tavily search failed", e);
         }
 
         int rank = 1;

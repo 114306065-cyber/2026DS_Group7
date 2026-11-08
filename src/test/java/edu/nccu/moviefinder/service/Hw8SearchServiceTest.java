@@ -1,6 +1,7 @@
 package edu.nccu.moviefinder.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import edu.nccu.moviefinder.model.SearchResult;
@@ -38,7 +39,7 @@ class Hw8SearchServiceTest {
     }
 
     @Test
-    void returnsNoResultsWhenTavilyFails() {
+    void reportsUnavailableWhenTavilyFails() {
         GoogleQuery google = new GoogleQuery("key", 10) {
             @Override
             public LinkedHashMap<String, String> query(String q) throws IOException {
@@ -46,11 +47,23 @@ class Hw8SearchServiceTest {
             }
         };
 
-        assertTrue(service(google).search("cat").isEmpty());
+        assertThrows(SearchUnavailableException.class, () -> service(google).search("cat"));
     }
 
     @Test
-    void returnsNoResultsWhenTheKeyIsMissing() {
-        assertTrue(service(new GoogleQuery("", 10)).search("cat").isEmpty());
+    void reportsUnavailableWhenTheKeyIsMissing() {
+        assertThrows(SearchUnavailableException.class, () -> service(new GoogleQuery("", 10)).search("cat"));
+    }
+
+    @Test
+    void returnsAnEmptyListWhenTavilyFindsNothing() {
+        GoogleQuery google = new GoogleQuery("key", 10) {
+            @Override
+            public LinkedHashMap<String, String> query(String q) {
+                return new LinkedHashMap<>();
+            }
+        };
+
+        assertTrue(service(google).search("zzzz").isEmpty());
     }
 }
