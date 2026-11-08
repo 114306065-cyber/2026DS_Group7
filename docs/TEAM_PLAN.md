@@ -10,33 +10,36 @@
 | **B 爬蟲與部署** | | 抓網頁、找子網頁、讓抓取變快,最後部署上線 | Boyer-Moore、HashSet |
 | **C 搜尋流程與整合** | | 把所有模組串成完整的搜尋流程,並負責排序 | QuickSort、HashMap |
 | **D 語意分析與 LLM 比較** | | 擴充查詢、從網頁找新關鍵字,最後和 LLM 比較 | TF-IDF |
-| **E 介面與 HW8** | Dana | 先完成 HW8(Tavily),之後決定並完成整個網站介面 | 樹狀結構的遞迴顯示 |
+| **E 介面與 HW8** | Dana | 先完成 HW8(Tavily),11/22 後完成整個網站介面 | 樹狀結構的遞迴顯示 |
 
 **介面排版由 E 決定。** 其他人不修改介面檔案,E 也不修改後端檔案。雙方只透過 `SearchResult` 交接。
 
 ## 時程
 
-| 期間 | 重點 | 結束時要做到 |
-|---|---|---|
-| **第一輪** 11/8～11/22 | 各自完成核心模組,E 完成 HW8 | **11/22(日)驗收**,標準見下方 |
-| **第二輪** 11/22～12/6 | 接上真實資料、兩輪迭代、完整介面 | **12/6(日)檢查**:Stage 3、4 能跑,介面完成初版 |
-| **第三輪** 12/6～12/13 | 部署、評估、LLM 比較 | **12/13(日)程式凍結**:公開網址可用,評估資料齊全 |
-| **收尾** 12/14～12/16 | 不加新功能,只修 bug 和排練 | **12/17 Demo** |
+| 階段 | 期間 | 誰在做什麼 | 結束時 |
+|---|---|---|---|
+| **0** | 11/8 | E 完成 HW8,把 `GoogleQuery` 交給 C | 大家開工 |
+| **1** | 11/8～11/15 | A～D 完成核心功能 | **11/15(日)中間檢查** |
+| **2** | 11/15～11/22 | A～D 用真實資料完成所有後端功能 | **11/22(日)功能驗收** |
+| **3** | 11/22～12/6 | E 優化介面;A～D 做評估、LLM 比較、部署 | **12/6(日)介面完成** |
+| **4** | 12/6～12/13 | A～D 測試介面並回報問題;E 修正 | **12/13(日)程式凍結** |
+| 收尾 | 12/14～12/16 | 不加新功能,只排練 | **12/17 Demo** |
 
-另一個硬期限:**HW8 在 11/15(日)23:59 繳交**,由 E 負責。
+HW8 的繳交期限是 **11/15(日)23:59**,由 E 負責。
 
-### 11/22 驗收清單
+### 兩條重要規則
 
-由 E 驗收,全部打勾才算通過:
+- **11/22 後,後端只修 bug。** `SearchResult` 的欄位也不再更改,E 才能放心做介面。
+- **12/6 後,介面只修測試回報的問題。** 不再大幅改版,讓大家能完整測試。
 
-- [ ] 所有人第一輪的 PR 都已併進 `main`
-- [ ] `./mvnw test` 在 `main` 上全部通過,第一輪的測試都已啟用
-- [ ] `StageDemo page` 能對 3 個網址輸出排名、分數和每個關鍵字的次數
-- [ ] `StageDemo site` 能印出網站樹,每個節點都有關鍵字次數
-- [ ] 輸入關鍵字後,能用 Tavily 跑完一輪真實搜尋,並依分數排序
-- [ ] `cat` 不會再算到 `category` 裡
+## 怎麼看下面的工作表
 
-沒通過的項目,負責人要在群組說明原因和新的完成日期。
+每項工作的「開始條件」欄:
+
+- **立即可做:** 不用等任何人,用測試資料或 mock 就能開發。
+- **等 X:** 必須等 X 完成並併進 `main` 才能開始。被等的那一方請**準時完成**,否則會卡住別人。
+
+每人在階段 1、2 的工作都是立即可做的,除了少數需要真實資料的項目。
 
 ## 每人詳細工作
 
@@ -44,166 +47,154 @@
 
 ### A 計分模型與評估
 
-**負責檔案**
-- `…/model/WebPage.java`、`WebNode.java`、`WebTree.java`
-- `…/model/Keyword.java`、`KeywordList.java`(已完成,有需要再改)
-- `…/cli/StageDemo.java`
-- `src/main/resources/keywords.csv`
-- `eval/` 中和 Tavily 原始排名的比較
+**負責檔案:** `…/model/` 下的所有檔案、`…/cli/StageDemo.java`、`src/main/resources/keywords.csv`
 
-**第一輪**
+| 階段 | 期限 | 工作 | 開始條件 | 檔案與 method |
+|---|---|---|---|---|
+| 1 | **11/12** | 單頁計分:Σ 次數 × 權重,記錄每個關鍵字的次數,重複呼叫不累加 | 立即可做 | `WebPage.setScore` |
+| 1 | **11/12** | 節點分數:自己 + 0.5 × 子節點分數總和 | 立即可做 | `WebNode.setNodeScore` |
+| 1 | **11/12** | 節點深度,根節點為 0 | 立即可做 | `WebNode.getDepth` |
+| 1 | **11/12** | 後序走訪計分,抓取失敗的網頁算 0 分 | 立即可做 | `WebTree.setPostOrderScore` |
+| 1 | 11/15 | 印出樹:每層縮排 2 格,含網址、分數和關鍵字次數 | 立即可做 | `WebTree.eulerPrintTree` |
+| 1 | 11/15 | 啟用 `WebPageTest`(3 個)、`WebTreeTest`(5 個) | 立即可做 | |
+| 1 | 11/15 | 確認 `StageDemo page`、`site` 能跑 | 等 C 的 Ranker、B 的子網頁 | `StageDemo` |
+| 2 | 11/22 | 用真實搜尋結果調整 `keywords.csv`,定出第一版權重 | 等 C 的一輪真實搜尋 | `keywords.csv` |
+| 2 | 11/22 | 實驗是否要依內文長度正規化分數 | 等 C 的一輪真實搜尋 | `WebPage` |
+| 3 | 12/6 | 計算 MovieFinder 和 Tavily 原始排名的 Precision@5 | 等 11/22 驗收通過 | `eval/` |
+| 4 | 12/13 | 在介面上確認分數和 breakdown 顯示正確 | 等 E 的介面完成 | |
 
-| 期限 | 工作 | 檔案與 method |
-|---|---|---|
-| 11/12 | 單頁計分:Σ 次數 × 權重,記錄每個關鍵字的次數,重複呼叫不累加 | `WebPage.setScore` |
-| 11/12 | 節點分數:自己 + 0.5 × 子節點分數總和 | `WebNode.setNodeScore` |
-| 11/12 | 節點深度,根節點為 0 | `WebNode.getDepth` |
-| 11/12 | 後序走訪計分,抓取失敗的網頁算 0 分 | `WebTree.setPostOrderScore` |
-| 11/15 | 印出樹:每層縮排 2 格,含網址、分數和關鍵字次數 | `WebTree.eulerPrintTree` |
-| 11/15 | 啟用 `WebPageTest`(3 個)、`WebTreeTest`(5 個) | |
-| 11/22 | 確認 `StageDemo page`、`site` 能跑 | 需要 B、C 的部分 |
-
-**第二輪(12/6 前)**
-- [ ] 調整 `keywords.csv`:增加或刪除關鍵字、調整權重,使用者關鍵字的權重必須最高
-- [ ] 實驗是否要依內文長度正規化分數(proposal §5.4),把比較結果記在 `eval/`
-
-**第三輪(12/13 前)**
-- [ ] 用 `eval/queries.csv` 計算 MovieFinder 和 Tavily 原始排名的 Precision@5
-- [ ] 依結果定案權重,整理成報告用的表格
-
-**誰在等你:** C 的搜尋流程需要你的 model,**11/12 前一定要合併**。
+**你的工作會卡住:** C(11/12 要用你的 model)。
 
 ### B 爬蟲與部署
 
-**負責檔案**
-- `…/service/WordCounter.java`
-- `…/service/SubLinkCrawler.java`
-- `…/service/PagePrefetcher.java`
-- 部署設定,例如 `Dockerfile`(自行新增)
+**負責檔案:** `…/service/WordCounter.java`、`SubLinkCrawler.java`、`PagePrefetcher.java`、部署設定(例如自行新增的 `Dockerfile`)
 
-**第一輪**
+| 階段 | 期限 | 工作 | 開始條件 | 檔案與 method |
+|---|---|---|---|---|
+| 1 | **11/12** | 英文關鍵字改成比對完整單字,中文維持原本比對方式 | 立即可做 | `WordCounter.countKeyword` |
+| 1 | 11/15 | 改用 Jsoup 只取內文,設定逾時和 User-Agent | 立即可做 | `WordCounter.fetchContent` |
+| 1 | 11/15 | 修 `last()` 重複建表、字串串接 O(n²) 兩個效能問題 | 立即可做 | `WordCounter` |
+| 1 | **11/15** | 從 HTML 取出最多 5 個同網域子網頁,去除重複和 `#` 錨點 | 立即可做 | `SubLinkCrawler.extractLinks` |
+| 1 | **11/15** | 用 Jsoup 抓 HTML,再交給 `extractLinks` | 立即可做 | `SubLinkCrawler.getSubLinks` |
+| 1 | 11/15 | 啟用 `WordCounterTest`(2 個)、`SubLinkCrawlerTest`(4 個) | 立即可做 | |
+| 2 | 11/22 | 改成用執行緒池平行抓取,啟用 `PagePrefetcherTest`(1 個) | 立即可做 | `PagePrefetcher.prefetch` |
+| 2 | 11/22 | 快取已抓過的網頁,已失敗的網址不重試 | 立即可做 | `PagePrefetcher` |
+| 2 | 11/22 | 設定整次搜尋的時間上限,和 C 一起測試 | 等 C 的一輪真實搜尋 | `PagePrefetcher` |
+| 2 | 11/22 | 比較雲端平台,確認能跑 Java 17 並設定環境變數 | 立即可做 | |
+| 3 | 11/29 | 部署上線,取得公開網址 | 等 11/22 驗收通過 | 部署設定 |
+| 3 | 12/6 | E 的介面完成後重新部署 | 等 E 的介面完成 | |
+| 4 | 12/13 | 在公開網址上測搜尋時間,準備 Demo 備案(例如錄影) | 等 12/6 部署 | |
 
-| 期限 | 工作 | 檔案與 method |
-|---|---|---|
-| 11/12 | **優先:** 英文關鍵字改成比對完整單字,中文維持原本比對方式 | `WordCounter.countKeyword` |
-| 11/15 | 改用 Jsoup 只取內文,設定逾時和 User-Agent | `WordCounter.fetchContent` |
-| 11/15 | 修 `last()` 重複建表、字串串接 O(n²) 兩個效能問題 | `WordCounter` |
-| 11/19 | 從 HTML 取出最多 5 個同網域子網頁,去除重複和 `#` 錨點 | `SubLinkCrawler.extractLinks` |
-| 11/19 | 用 Jsoup 抓 HTML,再交給 `extractLinks` | `SubLinkCrawler.getSubLinks` |
-| 11/19 | 啟用 `WordCounterTest`(2 個)、`SubLinkCrawlerTest`(4 個) | |
-| 11/22 | 確認 `StageDemo site` 能跑 | |
-
-**第二輪(12/6 前)**
-- [ ] `PagePrefetcher` 改成用執行緒池平行抓取,啟用 `PagePrefetcherTest`(1 個)
-- [ ] 快取已抓過的網頁,第二輪搜尋不重抓;已失敗的網址不重試
-- [ ] 設定整次搜尋的時間上限
-- [ ] 比較雲端平台,確認能跑 Java 17 並設定環境變數,在群組報告選擇
-
-**第三輪(12/13 前)**
-- [ ] **12/10 前**部署上線,取得公開網址,讓 E 在線上確認介面
-- [ ] 在公開網址上測一次搜尋要花多久
-- [ ] 準備 Demo 備案,例如事先錄影,以防現場網路出問題
-
-**誰在等你:** A 的分數準不準,取決於你的完整單字比對;C 的完整流程速度,取決於你的平行抓取。
+**你的工作會卡住:** A 的分數是否準確(完整單字比對)、`StageDemo site`(子網頁)、全組的 Demo(部署)。
 
 ### C 搜尋流程與整合
 
-**負責檔案**
-- `…/service/SearchService.java`
-- `…/service/Ranker.java`
-- `…/service/GoogleQuery.java`(**11/15 由 E 交接**後歸你)
+**負責檔案:** `…/service/SearchService.java`、`Ranker.java`、`GoogleQuery.java`(11/8 由 E 交接)
 
-**第一輪**
+| 階段 | 期限 | 工作 | 開始條件 | 檔案與 method |
+|---|---|---|---|---|
+| 1 | **11/10** | 自己實作 QuickSort,依總分由高到低排序,不可用內建排序 | 立即可做 | `Ranker.sort` |
+| 1 | 11/10 | 啟用 `RankerTest`(4 個) | 立即可做 | |
+| 1 | 11/8 | 接手 `GoogleQuery`,確認錯誤處理方式 | 等 E 交接(11/8) | `GoogleQuery` |
+| 1 | 11/15 | 建立網站樹:根節點加上子網頁,網頁一律用 `newPage` 建立 | 等 A 的 model(11/12) | `SearchService.buildTree` |
+| 1 | 11/15 | 跑一輪:搜尋、以網址去重、建樹、`prefetcher.prefetch`、計分、排序 | 等 A 的 model(11/12) | `SearchService.runRound` |
+| 1 | **11/15** | 用 Tavily 跑通一輪真實搜尋,通知大家 | 等 A 的 model、B 的子網頁 | |
+| 2 | 11/22 | 計算 breakdown,加總必須等於總分 | 立即可做 | `SearchService` |
+| 2 | 11/22 | 快取相同查詢的 Tavily 結果,節省額度 | 立即可做 | `GoogleQuery` 或 `SearchService` |
+| 2 | **11/22** | 完成最多 2 輪迭代,第二輪使用 D 找到的新關鍵字 | 等 D 的 `deriveKeywords`(11/15) | `SearchService.search` |
+| 2 | 11/22 | 啟用 `SearchServiceTest`(4 個) | 等上面完成 | |
+| 3 | 12/6 | 端對端測試:用 `eval/queries.csv` 的每個查詢跑一次,記錄結果數和時間 | 等 11/22 驗收通過 | |
+| 3 | 12/6 | 和 E 確認後刪除 `Hw8SearchService.java` | 等 E 的介面改用完整流程 | |
+| 4 | 12/13 | 在介面上測試錯誤情況:無結果、金鑰錯誤、網路中斷 | 等 E 的介面完成 | |
 
-| 期限 | 工作 | 檔案與 method |
-|---|---|---|
-| 11/12 | 自己實作 QuickSort,依總分由高到低排序,不可用內建排序 | `Ranker.sort` |
-| 11/12 | 啟用 `RankerTest`(4 個) | |
-| 11/19 | 建立網站樹:根節點加上 `SubLinkCrawler` 找到的子網頁,網頁一律用 `newPage` 建立 | `SearchService.buildTree` |
-| 11/19 | 跑一輪:搜尋每個查詢、以網址去重、建樹、`prefetcher.prefetch`、計分、排序 | `SearchService.runRound` |
-| 11/22 | 用 Tavily 跑通一輪真實搜尋 | 需要 A、E 的部分 |
-
-**第二輪(12/6 前)**
-- [ ] `search` 完成最多 2 輪迭代,第二輪使用 D 找到的新關鍵字
-- [ ] 計算 `breakdown`,加總必須等於總分(子網頁的貢獻要乘上折扣)
-- [ ] 快取相同查詢的 Tavily 結果,節省額度
-- [ ] 啟用 `SearchServiceTest`(4 個)
-- [ ] 完整流程可用後,和 E 確認並刪除 `Hw8SearchService.java`
-
-**第三輪(12/13 前)**
-- [ ] 端對端測試:用 `eval/queries.csv` 的每個查詢實際跑一次,記錄結果數和花費時間
-- [ ] 每個檢查日前確認 `main` 能跑,發現問題就交給對應負責人
-
-**誰在等你:** E 的介面需要真實資料;D 需要真實網頁來調整關鍵字品質。
+**你的工作會卡住:** A 的權重調整、B 的時間上限測試、D 的品質調整(都要你 11/15 的一輪真實搜尋),以及 E 的介面(要你 11/22 的完整流程)。**C 是時程的關鍵,有困難請盡早提出。**
 
 ### D 語意分析與 LLM 比較
 
-**負責檔案**
-- `…/service/KeywordExpander.java`
-- `src/main/resources/stopwords.txt`
-- `eval/` 中的 LLM 比較
+**負責檔案:** `…/service/KeywordExpander.java`、`src/main/resources/stopwords.txt`
 
-**第一輪**
+| 階段 | 期限 | 工作 | 開始條件 | 檔案與 method |
+|---|---|---|---|---|
+| 1 | 11/12 | 查詢擴充:`cat` → `cat movie`、`cat film`、`cat movie review` | 立即可做 | `KeywordExpander.expand` |
+| 1 | 11/12 | 比較 TF-IDF 和共現分析,選定方法,在群組說明理由 | 立即可做 | |
+| 1 | **11/15** | 從網頁內文找出相關關鍵字,排除停用字和原始查詢,權重介於 0 和使用者權重之間 | 立即可做(用固定文章測試) | `KeywordExpander.deriveKeywords` |
+| 1 | 11/15 | 啟用 `KeywordExpanderTest`(5 個) | 立即可做 | |
+| 2 | 11/22 | 用真實網頁檢查找到的關鍵字是否合理,擴充 `stopwords.txt` | 等 C 的一輪真實搜尋 | `stopwords.txt` |
+| 2 | 11/22 | 定下防止主題偏移的規則,例如限制每輪新增的關鍵字數量 | 等 C 的一輪真實搜尋 | `deriveKeywords` |
+| 3 | 12/6 | 比較加入新關鍵字前後,排名是否改善 | 等 11/22 驗收通過 | `eval/` |
+| 3 | 12/6 | 設計 LLM prompt,收集 ChatGPT、Gemini、DeepSeek 的結果,記錄模型版本和日期 | 立即可做 | `eval/` |
+| 3 | 12/6 | 確認 LLM 給的網址真實存在,完成比較分析 | 等上面完成 | `eval/` |
+| 4 | 12/13 | 在介面上確認比較頁的內容正確 | 等 E 的介面完成 | |
 
-| 期限 | 工作 | 檔案與 method |
-|---|---|---|
-| 11/12 | 查詢擴充:`cat` → `cat movie`、`cat film`、`cat movie review` | `KeywordExpander.expand` |
-| 11/15 | 比較 TF-IDF 和共現分析,選定方法,在群組說明理由 | |
-| 11/22 | 從網頁內文找出相關關鍵字,排除停用字和原始查詢,權重介於 0 和使用者權重之間 | `KeywordExpander.deriveKeywords` |
-| 11/22 | 啟用 `KeywordExpanderTest`(5 個) | |
-
-**第二輪(12/6 前)**
-- [ ] 用真實網頁檢查找到的關鍵字是否合理,擴充 `stopwords.txt`
-- [ ] 定下防止主題偏移的規則,例如限制每輪新增的關鍵字數量
-- [ ] 比較加入新關鍵字前後,排名是否改善
-
-**第三輪(12/13 前)**
-- [ ] 設計 LLM prompt,每個 LLM 使用相同的 prompt
-- [ ] 收集 ChatGPT、Gemini、DeepSeek 的結果,記錄模型版本和日期
-- [ ] 確認 LLM 給的網址真實存在
-- [ ] 完成比較分析
-
-**誰在等你:** C 的第二輪迭代需要 `deriveKeywords`。
+**你的工作會卡住:** C 的兩輪迭代(11/15 要用你的 `deriveKeywords`)。
 
 ### E 介面與 HW8(Dana)
 
-**負責檔案**
-- `…/service/GoogleQuery.java`(**到 11/15 為止**,之後交接給 C)
-- `…/service/Hw8SearchService.java`
-- `…/service/MockSearchService.java`
-- `…/controller/SearchController.java`
-- `src/main/resources/templates/` 下的所有頁面
-- `src/main/resources/static/`(自行新增 CSS、圖片)
+**負責檔案:** `…/service/Hw8SearchService.java`、`MockSearchService.java`、`…/controller/SearchController.java`、`src/main/resources/templates/`、`src/main/resources/static/`(自行新增)
 
-**HW8(11/15 繳交)**
+| 階段 | 期限 | 工作 | 開始條件 | 檔案與 method |
+|---|---|---|---|---|
+| 0 | **11/8** | 解析 Tavily 的 JSON、呼叫 Tavily API,啟用 `GoogleQueryTest`(4 個) | 立即可做 | `GoogleQuery.parse`、`query` |
+| 0 | **11/8** | 把 Tavily 結果包成 `SearchResult` | 立即可做 | `Hw8SearchService.search` |
+| 0 | **11/8** | 初步介面:搜尋框、結果清單、「沒有找到結果」提示 | 立即可做 | `index.html`、`result.html` |
+| 0 | **11/8** | 合併後把 `GoogleQuery` 交接給 C | | |
+| 1 | 11/15 | 截圖並上傳 Moodle,附上 GitHub 連結 | | |
+| 1、2 | 每次 PR | Review 組員的 PR | | |
+| 1 | 11/15 | 主持中間檢查 | | |
+| 2 | 11/22 | 主持功能驗收 | | |
+| 3 | 12/6 | 決定整體排版和視覺風格,加入 CSS | 立即可做(mock) | `static/`、`templates/` |
+| 3 | 12/6 | 結果頁:排名、總分、每個關鍵字的分數拆解、子網頁樹的展開與收合 | 立即可做(mock) | `result.html` |
+| 3 | 12/6 | 比較頁:Tavily 原始排名在左、MovieFinder 在右 | 立即可做(mock) | `compare.html` |
+| 3 | 12/6 | 錯誤畫面、無結果畫面、搜尋中的等待提示、手機版面 | 立即可做(mock) | `SearchController`、`templates/` |
+| 3 | 12/6 | 介面改用完整流程,並用真實資料確認 | 等 11/22 驗收通過 | |
+| 4 | 12/13 | 修正組員回報的介面問題 | 等組員回報 | |
+| 4 | 12/13 | 準備 Demo 腳本,彙整簡報 | | |
 
-| 期限 | 工作 | 檔案與 method |
-|---|---|---|
-| 11/12 | 申請 Tavily 金鑰,解析 Tavily 的 JSON | `GoogleQuery.parse` |
-| 11/12 | 呼叫 Tavily API,金鑰缺少時提示設定 `TAVILY_API_KEY` | `GoogleQuery.query` |
-| 11/12 | 啟用 `GoogleQueryTest`(4 個) | |
-| 11/14 | 把 Tavily 結果包成 `SearchResult` | `Hw8SearchService.search` |
-| 11/14 | 初步介面:搜尋框、結果清單、「沒有找到結果」提示 | `index.html`、`result.html` |
-| 11/15 | 截圖並上傳 Moodle,附上 GitHub 連結 | |
-| 11/15 | 把 `GoogleQuery` 交接給 C,說明錯誤處理方式 | |
+`SearchControllerTest` 會檢查頁面能正常顯示,改版後要維持通過。測試若依賴頁面文字,改版時一起更新。
 
-**第一輪剩下的時間**
-- [ ] Review 組員的 PR
-- [ ] 11/22 驗收
+## 檢查清單
 
-**第二輪(12/6 前)**
-- [ ] 決定整體排版和視覺風格,加入 CSS
-- [ ] 結果頁:排名、總分、每個關鍵字的分數拆解
-- [ ] 子網頁樹的展開與收合
-- [ ] 比較頁:Tavily 原始排名在左、MovieFinder 在右
-- [ ] 錯誤畫面、無結果畫面、搜尋中的等待提示
-- [ ] 手機版面
+### 11/15(日)中間檢查
 
-**第三輪(12/13 前)**
-- [ ] 在 B 部署的公開網址上確認介面
-- [ ] 準備 Demo 腳本,彙整簡報
+- [ ] HW8 已繳交
+- [ ] A 的 8 個測試、C 的 Ranker 4 個測試、D 的 5 個測試、B 的 6 個測試都已啟用並通過
+- [ ] `StageDemo page` 能對 3 個網址輸出排名、分數和每個關鍵字的次數
+- [ ] `StageDemo site` 能印出網站樹,每個節點都有關鍵字次數
+- [ ] 能用 Tavily 跑完一輪真實搜尋並排序
+- [ ] `cat` 不會再算到 `category` 裡
 
-**注意:** `SearchControllerTest` 會檢查頁面能正常顯示,改版後要維持通過。測試若依賴頁面文字,改版時一起更新。
+### 11/22(日)功能驗收
+
+- [ ] `./mvnw test` 全部通過,所有測試都已啟用
+- [ ] 真實搜尋能跑完兩輪,並依分數排序
+- [ ] 每筆結果的 breakdown 加總等於總分
+- [ ] 一次搜尋在大家同意的時間內完成
+- [ ] 權重第一版定案
+
+### 12/6(日)介面完成
+
+- [ ] 三個頁面都已完成,並使用真實資料
+- [ ] 已部署到公開網址
+- [ ] Precision@5 和 LLM 比較的資料收集完成
+
+### 12/13(日)程式凍結
+
+- [ ] 測試回報的問題都已修正或決定不修
+- [ ] 公開網址上的版本就是 Demo 版本
+- [ ] 評估結果整理完成,可以放進報告
+
+沒通過的項目,負責人要在群組說明原因和新的完成日期。
+
+## 階段 4:怎麼回報介面問題
+
+用 GitHub 的 Issues 回報,不要只在群組說,以免遺漏:
+
+1. 到 repo 的 **Issues** 分頁,按 **New issue**。
+2. 標題寫清楚問題,例如「搜尋 cooking 時子網頁樹無法展開」。
+3. 內容寫:輸入了什麼、預期看到什麼、實際看到什麼,附上截圖。
+4. 右側 **Assignees** 選 E。
+
+E 修好後,在 PR 說明裡寫 `Fixes #編號`,合併時 Issue 會自動關閉。
 
 ## 檔案歸屬總表
 
@@ -212,11 +203,10 @@
 | 檔案 | 負責人 |
 |---|---|
 | `model/Keyword.java`、`KeywordList.java`、`WebPage.java`、`WebNode.java`、`WebTree.java` | A |
-| `model/SearchResult.java` | A,**欄位要改須先和 C、E 討論** |
+| `model/SearchResult.java` | A,**11/22 後不再更改** |
 | `cli/StageDemo.java`、`keywords.csv` | A |
 | `service/WordCounter.java`、`SubLinkCrawler.java`、`PagePrefetcher.java`、部署設定 | B |
-| `service/SearchService.java`、`Ranker.java` | C |
-| `service/GoogleQuery.java` | E → 11/15 後歸 C |
+| `service/SearchService.java`、`Ranker.java`、`GoogleQuery.java` | C(`GoogleQuery` 在 11/8 由 E 交接) |
 | `service/KeywordExpander.java`、`stopwords.txt` | D |
 | `service/Hw8SearchService.java`、`MockSearchService.java`、`controller/SearchController.java` | E |
 | `templates/`、`static/` | E |
@@ -227,13 +217,14 @@
 
 | 交接內容 | 從誰 | 到誰 | 時間 | 交接時要說明 |
 |---|---|---|---|---|
+| `GoogleQuery` | E | C | 11/8 | 錯誤和額度用盡時的行為 |
 | `WebPage`、`WebNode`、`WebTree` | A | C | 11/12 | 失敗網頁的處理方式 |
-| `GoogleQuery` | E | C | 11/15 | 錯誤和額度用盡時的行為 |
-| `deriveKeywords` | D | C | 11/22 | 每次回傳多少關鍵字、權重範圍 |
-| 完整搜尋流程 | C | E | 第二輪初 | 一次搜尋大約花多久 |
-| 公開網址 | B | E | 12/10 | 網址和重新部署的方式 |
-
-`SearchResult` 是後端和介面之間唯一的介面:後端負責把資料放進去,介面只負責顯示。
+| `Ranker`、子網頁 | C、B | A | 11/15 | 讓 `StageDemo` 能跑 |
+| `deriveKeywords` 第一版 | D | C | 11/15 | 每次回傳多少關鍵字、權重範圍 |
+| 一輪真實搜尋 | C | A、B、D | 11/15 | 怎麼啟動、一次搜尋大約花多久 |
+| 完整後端 | A～D | E | 11/22 | `SearchResult` 每個欄位的意思 |
+| 公開網址 | B | E | 11/29 | 網址和重新部署的方式 |
+| 完成的介面 | E | A～D | 12/6 | 要測哪些頁面和功能 |
 
 ## 每次開工的流程
 
@@ -262,7 +253,7 @@ git push -u origin feature/ranker-quicksort
 
 規則:
 
-- 一項工作一條分支,最好 2～3 天、最晚一週內合併。
+- 一項工作一條分支,最好 2～3 天內合併。工作表上標粗體的期限,別人在等,請務必準時。
 - `./mvnw test` 沒全過不可以合併。
 - 不要 commit API key。repo 是公開的,金鑰一旦 commit 就要立刻到 Tavily 換新的。
 - 不小心在 `main` 上改了,還沒 commit 的話,直接執行 `git checkout -b feature/xxx`,改動會帶到新分支。
@@ -277,9 +268,9 @@ git push -u origin feature/ranker-quicksort
 |---|---|---|
 | A | `./mvnw test -Dtest=WebPageTest,WebTreeTest` | `StageDemo page`、`site` |
 | B | `./mvnw test -Dtest=WordCounterTest,SubLinkCrawlerTest,PagePrefetcherTest` | `StageDemo site` |
-| C | `./mvnw test -Dtest=RankerTest,SearchServiceTest` | 設定 `TAVILY_API_KEY` 後啟動完整網站 |
-| D | `./mvnw test -Dtest=KeywordExpanderTest` | C 的流程完成後啟動完整網站 |
-| E | `./mvnw test -Dtest=GoogleQueryTest`,以及 mock 模式和 hw8 模式 | C 的流程完成後啟動完整網站 |
+| C | `./mvnw test -Dtest=RankerTest,SearchServiceTest,GoogleQueryTest` | 設定 `TAVILY_API_KEY` 後啟動完整網站 |
+| D | `./mvnw test -Dtest=KeywordExpanderTest` | C 的一輪真實搜尋完成後啟動完整網站 |
+| E | mock 模式和 hw8 模式 | 11/22 後啟動完整網站 |
 
 啟動網站和 `StageDemo` 的指令在 [README](../README.md)。Windows 請把 `./mvnw` 換成 `mvnw.cmd`。
 
@@ -297,7 +288,7 @@ git push -u origin feature/ranker-quicksort
 | B | `WordCounterTest`(2 個)、`SubLinkCrawlerTest`(4 個)、`PagePrefetcherTest`(1 個) | 7 |
 | C | `RankerTest`(4 個)、`SearchServiceTest`(4 個) | 8 |
 | D | `KeywordExpanderTest`(5 個) | 5 |
-| E | `GoogleQueryTest`(4 個) | 4 |
+| E | `GoogleQueryTest`(4 個),HW8 時啟用 | 4 |
 
 ## 工作量
 
@@ -313,14 +304,10 @@ git push -u origin feature/ranker-quicksort
 | 報告與 Demo | 2 | 2 | 2 | 2 | 2 |
 | **合計** | **20** | **20** | **19** | **20** | **21** |
 
-全組一起做、不計入上表的工作:
-
-- 人工評分,方式見 `eval/README.md`。
-- 互相 review PR。
-- 期末報告,每人講自己的模組和資料結構。
+各階段的忙碌程度不同:A～D 在 11/22 前最忙,E 在 11/22 後最忙。階段 4 的介面測試和人工評分由全組分攤,不計入上表。
 
 ## 維持公平的做法
 
 - 工作量以完成的項目為準,不看 commit 數或程式行數。
-- 卡關超過兩天就在群組提出。
+- 卡關超過兩天就在群組提出,尤其是會卡住別人的工作。
 - 檢查日如果發現有人明顯過重,就把「強化」那一列的工作移給較輕鬆的人。
