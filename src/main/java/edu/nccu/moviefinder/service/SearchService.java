@@ -56,6 +56,15 @@ public class SearchService {
         throw new UnsupportedOperationException("TODO(Member C): SearchService.buildTree");
     }
 
+    /**
+     * 和查詢相關的關鍵字,顯示在結果頁的 Related Keywords。目前回傳空清單,頁面會隱藏這個區塊。
+     * TODO(Member C、D): 接上 KeywordExpander.deriveKeywords 的結果。
+     * 注意不要為此重跑一次搜尋,可以在 search 時保存結果,或改成由 search 一起回傳。
+     */
+    public List<String> relatedKeywords(String q) {
+        return List.of();
+    }
+
     /** 所有 WebPage 都由此建立,測試時可覆寫成不連網的版本。 */
     protected WebPage newPage(String url, String title) {
         return new WebPage(url, title);

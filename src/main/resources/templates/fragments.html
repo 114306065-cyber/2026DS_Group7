@@ -7,30 +7,72 @@
     <title th:text="${title}">MovieFinder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Oswald:wght@500;600&family=Playfair+Display:wght@600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<a th:fragment="logo" class="logo" th:href="@{/}"><span class="logo-icon" aria-hidden="true">🎬</span>MovieFinder</a>
+<!-- Site header. path = current page (for the language links); active = search | compare | about. -->
+<header th:fragment="siteHeader(path, active)" class="site-header">
+    <a class="logo" th:href="@{/}">
+        <svg class="logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="3" y="12" width="26" height="16" rx="2.5" class="logo-body"/>
+            <path d="M3.5 6.5 L27 3 L28 9 L4.5 12.5 Z" class="logo-top"/>
+            <path d="M8 6 L11 10.6 M14 5.1 L17 9.7 M20 4.2 L23 8.8" class="logo-stripes"/>
+            <path d="M14 16.5 L19.5 20 L14 23.5 Z" class="logo-play"/>
+        </svg>
+        <span>MovieFinder</span>
+    </a>
+    <nav class="site-nav" th:attr="aria-label=#{nav.label}">
+        <a th:href="@{/}" th:classappend="${active == 'search'} ? 'is-active'" th:text="#{nav.search}">Search</a>
+        <a th:href="${q == null} ? @{/compare} : @{/compare(q=${q})}" th:classappend="${active == 'compare'} ? 'is-active'" th:text="#{nav.compare}">Compare</a>
+        <a th:href="@{/about}" th:classappend="${active == 'about'} ? 'is-active'" th:text="#{nav.about}">About</a>
+    </nav>
+    <details class="lang-menu">
+        <summary th:attr="aria-label=#{lang.aria}">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>
+            </svg>
+            <span th:text="${#locale.language == 'zh'} ? '中文' : 'EN'">EN</span>
+            <svg class="chevron" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </summary>
+        <div class="lang-options">
+            <a lang="en" th:href="${q == null} ? @{${path}(lang='en')} : @{${path}(q=${q},lang='en')}"
+               th:classappend="${#locale.language != 'zh'} ? 'is-active'">English</a>
+            <a lang="zh-Hant" th:href="${q == null} ? @{${path}(lang='zh')} : @{${path}(q=${q},lang='zh')}"
+               th:classappend="${#locale.language == 'zh'} ? 'is-active'">中文</a>
+        </div>
+    </details>
+</header>
 
-<form th:fragment="searchForm" class="search" th:action="@{/search}" method="get" role="search">
+<!-- Search form. action = /search or /compare. -->
+<form th:fragment="searchForm(action)" class="search" th:action="@{${action}}" method="get" role="search">
+    <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>
+    </svg>
     <label class="sr-only" for="q" th:text="#{search.label}">Search movies by theme</label>
     <input id="q" type="search" name="q" th:value="${q}" th:placeholder="#{search.placeholder}" autocomplete="off" required>
-    <button type="submit" th:text="#{search.button}">Search</button>
+    <button type="button" class="search-clear" th:attr="aria-label=#{search.clear}" th:title="#{search.clear}"
+            onclick="var i=this.form.elements.q;i.value='';i.focus();">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <button type="submit" class="search-submit" th:text="#{search.button}">Search</button>
 </form>
 
-<!-- path is the current page; the link keeps the query and flips the language. -->
-<a th:fragment="langToggle(path)" class="lang-toggle"
-   th:with="other=${#locale.language == 'zh'} ? 'en' : 'zh'"
-   th:href="${q == null} ? @{${path}(lang=${other})} : @{${path}(q=${q},lang=${other})}"
-   th:title="#{lang.aria}" th:attr="aria-label=#{lang.aria}">
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>
+<!-- Pill link to the compare page. -->
+<a th:fragment="compareLink(label)" class="pill-link" th:href="${q == null} ? @{/compare} : @{/compare(q=${q})}">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M12 4v16M7 20h10M5 7h14M5 7l-3 6a3 3 0 0 0 6 0zM19 7l-3 6a3 3 0 0 0 6 0z"/>
     </svg>
-    <span th:text="#{lang.switch}">中文</span>
+    <span th:text="${label}">Compare with Tavily</span>
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
 </a>
+
+<!-- External link icon. -->
+<svg th:fragment="externalIcon" class="ext-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
+    <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+</svg>
 
 </body>
 </html>

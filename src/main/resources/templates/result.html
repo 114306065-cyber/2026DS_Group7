@@ -1,61 +1,113 @@
 <!DOCTYPE html>
 <html th:lang="${#locale.language == 'zh'} ? 'zh-Hant' : 'en'" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head(#{result.title(${q})})}"></head>
-<body>
-    <header class="topbar">
-        <a th:replace="~{fragments :: logo}"></a>
-        <form th:replace="~{fragments :: searchForm}"></form>
-        <a th:replace="~{fragments :: langToggle('/search')}"></a>
-    </header>
+<body class="page-results">
+    <header th:replace="~{fragments :: siteHeader('/search', 'search')}"></header>
+    <div class="curtain curtain-left" aria-hidden="true"></div>
+    <div class="curtain curtain-right" aria-hidden="true"></div>
 
-    <main class="page">
-        <div class="page-head">
-            <h1 th:text="#{result.heading(${q})}">Results for “cat”</h1>
-            <a class="text-link" th:href="@{/compare(q=${q})}" th:text="#{result.compare}">Compare with Tavily</a>
+    <main class="results-page">
+        <div class="results-search">
+            <form th:replace="~{fragments :: searchForm('/search')}"></form>
         </div>
 
-        <p class="empty empty--error" th:if="${searchError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
-        <p class="empty" th:if="${results.isEmpty() and searchError == null}" th:text="#{result.none}">No results found.</p>
+        <div class="results-head">
+            <div>
+                <h1 th:text="#{result.heading(${q})}">Results for “cat”</h1>
+                <p class="results-meta" th:unless="${searchError}" th:text="#{result.count(${results.size()})}">10 websites found</p>
+            </div>
+            <a th:replace="~{fragments :: compareLink(#{result.compare})}"></a>
+        </div>
 
-        <ol class="tickets" th:unless="${results.isEmpty()}">
-            <li class="ticket" th:each="r : ${results}">
-                <div class="ticket-main">
-                    <a class="ticket-title" th:href="${r.url}" th:text="${r.title}"
-                       target="_blank" rel="noopener noreferrer">Title</a>
-                    <p class="ticket-url" th:text="${r.url}">https://example.com</p>
+        <p class="notice notice--error" th:if="${searchError}" role="alert" th:text="#{search.unavailable}">Search is temporarily unavailable.</p>
+        <p class="notice" th:if="${results.isEmpty() and searchError == null}" th:text="#{result.none}">No results found.</p>
 
-                    <!-- Score and breakdown appear once the full ranking is connected (hidden in HW8 mode). -->
-                    <div class="ticket-score" th:unless="${r.breakdown.isEmpty()}">
-                        <p class="score">
-                            <span th:text="#{ticket.score}">Score</span>
-                            <strong th:text="${#numbers.formatDecimal(r.score, 1, 1)}">0.0</strong>
-                        </p>
-                        <ul class="chips" th:attr="aria-label=#{ticket.breakdown}">
-                            <li th:each="b : ${r.breakdown}">
-                                <span th:text="${b.key}">keyword</span>
-                                <strong th:text="${#numbers.formatDecimal(b.value, 1, 1)}">0.0</strong>
-                            </li>
-                        </ul>
+        <div class="results-layout" th:unless="${results.isEmpty()}"
+             th:classappend="${contributions.isEmpty() and relatedKeywords.isEmpty()} ? 'no-sidebar'">
+
+            <aside class="results-sidebar" th:unless="${contributions.isEmpty() and relatedKeywords.isEmpty()}">
+                <section class="panel" th:unless="${contributions.isEmpty()}">
+                    <div class="panel-head">
+                        <h2 th:text="#{panel.score}">Score breakdown</h2>
+                        <span class="info" tabindex="0" th:title="#{panel.scoreInfo}" th:attr="aria-label=#{panel.scoreInfo}">i</span>
                     </div>
+                    <p class="panel-note" th:text="#{panel.scoreNote}">How each keyword contributes to the top result</p>
+                    <ul class="bars">
+                        <li th:each="c : ${contributions}" th:classappend="${c.value < 0} ? 'is-negative'">
+                            <span class="bar-label" th:text="${c.keyword}">keyword</span>
+                            <span class="bar-track"><span class="bar-fill" th:style="'width:' + ${c.percent} + '%'"></span></span>
+                            <span class="bar-value" th:text="${#numbers.formatDecimal(c.value, 1, 1)}">0.0</span>
+                        </li>
+                    </ul>
+                </section>
+                <section class="panel" th:unless="${relatedKeywords.isEmpty()}">
+                    <div class="panel-head"><h2 th:text="#{panel.related}">Related keywords</h2></div>
+                    <ul class="tags">
+                        <li th:each="k : ${relatedKeywords}"><a th:href="@{/search(q=${k})}" th:text="${k}">keyword</a></li>
+                    </ul>
+                </section>
+            </aside>
 
-                    <!-- Subpage tree appears once the crawler is connected (hidden in HW8 mode). -->
-                    <details class="subpages" th:unless="${r.tree.root.children.isEmpty()}">
-                        <summary th:text="#{ticket.subpages(${r.tree.root.children.size()})}">Subpages (5)</summary>
-                        <ul class="tree">
-                            <th:block th:each="child : ${r.tree.root.children}">
-                                <th:block th:insert="~{result :: tree(${child})}"></th:block>
-                            </th:block>
-                        </ul>
-                    </details>
-                </div>
-                <div class="ticket-stub">
-                    <span class="stub-label" th:text="#{ticket.no}">No.</span>
-                    <span class="stub-rank" th:text="${#numbers.formatInteger(r.rank, 2)}">01</span>
-                    <span class="stub-admit" th:text="#{ticket.admit}">Admit one</span>
-                </div>
-            </li>
-        </ol>
+            <div class="results-main">
+                <section class="featured" th:if="${featured != null}">
+                    <div class="featured-art" aria-hidden="true">
+                        <svg viewBox="0 0 120 160"><rect class="fa-frame" x="6" y="6" width="108" height="148" rx="8"/>
+                            <g class="fa-holes"><rect x="12" y="14" width="8" height="10" rx="2"/><rect x="12" y="34" width="8" height="10" rx="2"/><rect x="12" y="54" width="8" height="10" rx="2"/><rect x="12" y="74" width="8" height="10" rx="2"/><rect x="12" y="94" width="8" height="10" rx="2"/><rect x="12" y="114" width="8" height="10" rx="2"/><rect x="12" y="134" width="8" height="10" rx="2"/><rect x="100" y="14" width="8" height="10" rx="2"/><rect x="100" y="34" width="8" height="10" rx="2"/><rect x="100" y="54" width="8" height="10" rx="2"/><rect x="100" y="74" width="8" height="10" rx="2"/><rect x="100" y="94" width="8" height="10" rx="2"/><rect x="100" y="114" width="8" height="10" rx="2"/><rect x="100" y="134" width="8" height="10" rx="2"/></g>
+                            <path class="fa-play" d="M50 64 L76 80 L50 96 Z"/></svg>
+                    </div>
+                    <div class="featured-body">
+                        <span class="badge" th:text="'★ ' + #{featured.label}">★ Top match</span>
+                        <h2><a th:href="${featured.url}" th:text="${featured.title}" target="_blank" rel="noopener noreferrer">Title</a></h2>
+                        <p class="featured-found" th:text="#{featured.found(${featuredMatches}, ${topN})}">Found in 3 of the top 5 results</p>
+                        <p class="featured-snippet" th:unless="${featured.snippet.isEmpty()}" th:text="${featured.snippet}">Snippet</p>
+                        <div class="featured-sources" th:unless="${sources.isEmpty()}">
+                            <h3 th:text="#{featured.sources}">Related sources</h3>
+                            <ul class="tags">
+                                <li th:each="s : ${sources}">
+                                    <a th:href="${s.url}" target="_blank" rel="noopener noreferrer"><span th:text="${s.label}">Wikipedia</span><svg th:replace="~{fragments :: externalIcon}"></svg></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <h2 class="list-title" th:text="#{result.list}">Website results</h2>
+                <ol class="result-list">
+                    <li class="result" th:each="r : ${results}">
+                        <span class="result-rank" th:text="${#numbers.formatInteger(r.rank, 2)}">01</span>
+                        <div class="result-body">
+                            <a class="result-title" th:href="${r.url}" th:text="${r.title}" target="_blank" rel="noopener noreferrer">Title</a>
+                            <p class="result-url" th:text="${r.url}">https://example.com</p>
+                            <p class="result-snippet" th:unless="${r.snippet.isEmpty()}" th:text="${r.snippet}">Snippet</p>
+                            <details class="result-details" th:unless="${r.breakdown.isEmpty() and r.tree.root.children.isEmpty()}">
+                                <summary th:text="#{result.details}">Score details</summary>
+                                <ul class="chips" th:unless="${r.breakdown.isEmpty()}">
+                                    <li th:each="b : ${r.breakdown}"><span th:text="${b.key}">kw</span> <strong th:text="${#numbers.formatDecimal(b.value, 1, 1)}">0.0</strong></li>
+                                </ul>
+                                <div th:unless="${r.tree.root.children.isEmpty()}">
+                                    <p class="tree-title" th:text="#{result.subpages(${r.tree.root.children.size()})}">Subpages (2)</p>
+                                    <ul class="tree">
+                                        <th:block th:each="child : ${r.tree.root.children}">
+                                            <th:block th:insert="~{result :: tree(${child})}"></th:block>
+                                        </th:block>
+                                    </ul>
+                                </div>
+                            </details>
+                        </div>
+                        <div class="result-score" th:unless="${r.breakdown.isEmpty()}">
+                            <span th:text="#{result.score}">Score</span>
+                            <strong th:text="${#numbers.formatDecimal(r.score, 1, 0)}">96</strong>
+                        </div>
+                        <a class="result-open" th:href="${r.url}" target="_blank" rel="noopener noreferrer"
+                           th:title="#{result.open}" th:attr="aria-label=#{result.open}">
+                            <svg th:replace="~{fragments :: externalIcon}"></svg>
+                        </a>
+                    </li>
+                </ol>
+            </div>
+        </div>
     </main>
+    <svg th:replace="~{illustrations :: reel}"></svg>
 
     <!-- Recursive fragment: one subpage and then its own subpages. -->
     <th:block th:if="${false}">
@@ -63,9 +115,7 @@
             <a th:href="${node.webPage.url}" th:text="${node.webPage.title}" target="_blank" rel="noopener noreferrer">Page</a>
             <span class="tree-score" th:text="${#numbers.formatDecimal(node.nodeScore, 1, 1)}">0.0</span>
             <ul class="chips chips--small">
-                <li th:each="c : ${node.webPage.counts}" th:if="${c.value > 0}">
-                    <span th:text="${c.key}">keyword</span> <strong th:text="${c.value}">0</strong>
-                </li>
+                <li th:each="c : ${node.webPage.counts}" th:if="${c.value > 0}"><span th:text="${c.key}">kw</span> <strong th:text="${c.value}">0</strong></li>
             </ul>
             <ul class="tree" th:unless="${node.children.isEmpty()}">
                 <th:block th:each="child : ${node.children}">
