@@ -33,11 +33,6 @@
 
     /* Decorations */
     --decor-line: #dcc4a0;
-    --decor-knob: #b27a3a;
-    --strip: #d8c09b;
-    --strip-hole: #f7f0e4;
-    --strip-frame: #efe1c8;
-    --strip-scene: #cdb48c;
     --curtain: none;
 
     --font-body: "Inter", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
@@ -46,43 +41,41 @@
     --hero-style: normal;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #0f1522;
-        --bg-glow: #151d2e;
-        --surface: #161f30;
-        --surface-2: #1b2638;
-        --text: #f3ead9;
-        --muted: #a8b0c0;
-        --line: #2b3650;
-        --gold: #e3b35d;
-        --gold-strong: #f0c56f;
-        --gold-soft: rgba(227, 179, 93, 0.14);
-        --button-from: #f2c86f;
-        --button-to: #d9a446;
-        --button-text: #1a1309;
-        --badge-bg: rgba(227, 179, 93, 0.16);
-        --badge-text: #f0c56f;
-        --focus: #f0c56f;
-        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 30px rgba(0, 0, 0, 0.35);
-        --error-bg: rgba(179, 32, 44, 0.18);
-        --error-line: #7d1820;
-        --negative: #ef8a7c;
-        --up: #7fcf8c;
-        --down: #ef8a7c;
-        --theme-name: #f6eedf;
-        --theme-name-style: italic;
+:root {
+    color-scheme: light;
+}
 
-        --decor-line: #2f3b55;
-        --decor-knob: #e3b35d;
-        --strip: #1c2638;
-        --strip-hole: #0f1522;
-        --strip-frame: #2a3750;
-        --strip-scene: #3a4c6a;
-        --curtain: repeating-linear-gradient(90deg, #4e0c13 0 10px, #7a1520 10px 22px, #5d0f17 22px 30px);
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0f1522;
+    --bg-glow: #151d2e;
+    --surface: #161f30;
+    --surface-2: #1b2638;
+    --text: #f3ead9;
+    --muted: #a8b0c0;
+    --line: #2b3650;
+    --gold: #e3b35d;
+    --gold-strong: #f0c56f;
+    --gold-soft: rgba(227, 179, 93, 0.14);
+    --button-from: #f2c86f;
+    --button-to: #d9a446;
+    --button-text: #1a1309;
+    --badge-bg: rgba(227, 179, 93, 0.16);
+    --badge-text: #f0c56f;
+    --focus: #f0c56f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 30px rgba(0, 0, 0, 0.35);
+    --error-bg: rgba(179, 32, 44, 0.18);
+    --error-line: #7d1820;
+    --negative: #ef8a7c;
+    --up: #7fcf8c;
+    --down: #ef8a7c;
+    --theme-name: #f6eedf;
+    --theme-name-style: italic;
 
-        --hero-style: italic;
-    }
+    --decor-line: #2f3b55;
+    --curtain: repeating-linear-gradient(90deg, #4e0c13 0 10px, #7a1520 10px 22px, #5d0f17 22px 30px);
+
+    --hero-style: italic;
 }
 
 /* ---------- Base ---------- */
@@ -184,11 +177,9 @@ h3 {
     fill: #f3ead9;
 }
 
-@media (prefers-color-scheme: dark) {
-    .logo-body,
-    .logo-top {
-        fill: #c9473a;
-    }
+:root[data-theme="dark"] .logo-body,
+:root[data-theme="dark"] .logo-top {
+    fill: #c9473a;
 }
 
 .site-nav {
@@ -215,9 +206,49 @@ h3 {
     font-weight: 600;
 }
 
+.header-tools {
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 10px;
+}
+
+.theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+/* Show the moon in light mode (click for dark) and the sun in dark mode. */
+.theme-toggle .icon-sun,
+:root[data-theme="dark"] .theme-toggle .icon-moon {
+    display: none;
+}
+
+:root[data-theme="dark"] .theme-toggle .icon-sun {
+    display: block;
+}
+
 .lang-menu {
     position: relative;
-    justify-self: end;
 }
 
 .lang-menu summary {
@@ -406,21 +437,9 @@ h3 {
 }
 
 .film-ribbon {
-    width: min(300px, 70%);
+    width: min(380px, 80%);
     height: auto;
-    margin-bottom: -18px;
-}
-
-.film-ribbon .strip {
-    stroke: var(--strip);
-}
-
-.film-ribbon .strip-holes {
-    stroke: var(--strip-hole);
-}
-
-.film-ribbon .strip-frames {
-    stroke: var(--strip-frame);
+    margin-bottom: -14px;
 }
 
 .hero-title {
@@ -482,23 +501,24 @@ h3 {
 }
 
 .decor-left {
-    left: -20px;
+    left: 0;
     top: 0;
-    width: 260px;
-    opacity: 0.7;
+    width: 250px;
+    height: auto;
 }
 
 .decor-right {
-    right: 40px;
-    top: 10px;
-    width: 120px;
-    opacity: 0.9;
+    right: 0;
+    top: 0;
+    width: 210px;
+    height: auto;
 }
 
 .decor-strip {
-    left: -60px;
-    top: 10px;
-    width: 560px;
+    left: -40px;
+    top: -8px;
+    width: 580px;
+    height: auto;
     display: none;
 }
 
@@ -506,45 +526,24 @@ h3 {
     stroke: var(--decor-line);
 }
 
-.decor-knob {
-    fill: var(--decor-knob);
+:root[data-theme="dark"] .decor-left,
+:root[data-theme="dark"] .decor-right {
+    display: none;
 }
 
-.decor-strip .strip {
-    fill: var(--strip);
+:root[data-theme="dark"] .decor-strip {
+    display: block;
+    opacity: 0.85;
 }
 
-.decor-strip .strip-holes {
-    fill: var(--strip-hole);
-}
-
-.decor-strip .strip-frame {
-    fill: var(--strip-frame);
-}
-
-.decor-strip .strip-scene {
-    fill: var(--strip-scene);
-}
-
-@media (prefers-color-scheme: dark) {
-    .decor-left,
-    .decor-right {
-        display: none;
-    }
-
-    .decor-strip {
-        display: block;
-        opacity: 0.8;
-    }
-
-    /* The diagonal strip already frames the title in dark mode. */
-    .film-ribbon {
-        display: none;
-    }
+/* The diagonal strip already frames the title in dark mode. */
+:root[data-theme="dark"] .film-ribbon {
+    display: none;
 }
 
 /* Chinese has no true italic; a slanted Chinese glyph looks distorted. */
-html:lang(zh-Hant) {
+html:lang(zh-Hant),
+html[data-theme]:lang(zh-Hant) {
     --hero-style: normal;
     --theme-name-style: normal;
 }
@@ -595,7 +594,7 @@ html:lang(zh-Hant) .hero-compare-note {
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: var(--ill-a);
+    background: var(--card-fade, var(--surface)) var(--card-img, none) var(--card-pos, right center) / cover no-repeat;
     box-shadow: var(--shadow);
     text-decoration: none;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -614,24 +613,15 @@ html:lang(zh-Hant) .hero-compare-note {
     font-size: clamp(24px, 2.6vw, 32px);
     font-style: var(--theme-name-style);
     font-weight: 700;
-    text-shadow: 0 1px 0 color-mix(in srgb, var(--ill-a) 70%, transparent), 0 2px 14px color-mix(in srgb, var(--ill-a) 80%, transparent);
+    text-shadow: 0 1px 0 color-mix(in srgb, var(--card-fade) 70%, transparent), 0 0 10px color-mix(in srgb, var(--card-fade) 95%, transparent), 0 0 22px color-mix(in srgb, var(--card-fade) 80%, transparent);
 }
 
-.ill {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-}
-
-/* Fade the sky behind the theme name, then add a light film grain over the whole card. */
+/* Fade the left side of the artwork into a solid colour so the theme name stays readable. */
 .theme-card::after {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
-        linear-gradient(90deg, color-mix(in srgb, var(--ill-a) 92%, transparent) 0%, color-mix(in srgb, var(--ill-a) 55%, transparent) 30%, transparent 58%);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--card-fade) 85%, transparent) 0%, color-mix(in srgb, var(--card-fade) 50%, transparent) 22%, color-mix(in srgb, var(--card-fade) 12%, transparent) 38%, transparent 50%);
     pointer-events: none;
 }
 
@@ -641,7 +631,7 @@ html:lang(zh-Hant) .hero-compare-note {
     inset: 0;
     z-index: 1;
     border-radius: inherit;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 -40px 60px -40px rgba(0, 0, 0, 0.25);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
     pointer-events: none;
 }
 
@@ -649,65 +639,20 @@ html:lang(zh-Hant) .hero-compare-note {
     z-index: 2;
 }
 
-.ill .k-a { stop-color: var(--ill-a); }
-.ill .k-b { stop-color: var(--ill-b); }
-.ill .k-c { stop-color: var(--ill-c); }
-.ill .cloud { fill: var(--ill-cloud); opacity: 0.9; }
-.ill .far { fill: var(--ill-far); }
-.ill .near { fill: var(--ill-near); }
-.ill .mountain { fill: var(--ill-mountain); }
-.ill .snow { fill: #f6f3ee; }
-.ill .steam { stroke: var(--ill-steam); opacity: 0.6; }
-.ill .window { fill: var(--ill-window); }
-.ill .window-bar { stroke: var(--ill-far); }
-.ill .star { fill: var(--ill-star); }
-.ill .silhouette { fill: var(--ill-silhouette); }
-.ill .bird { stroke: var(--ill-silhouette); }
+/* Artwork per theme: --card-img is the picture, --card-fade is the average colour of its left side. */
+.theme-animals { --card-img: url("../images/themes/animals-light.webp"); --card-fade: #d8d4c1; --card-pos: calc(100% + 100px) center; }
+.theme-cooking { --card-img: url("../images/themes/cooking-light.webp"); --card-fade: #e6d2b0; }
+.theme-friendship { --card-img: url("../images/themes/friendship-light.webp"); --card-fade: #d3c9c0; }
+.theme-ai { --card-img: url("../images/themes/ai-light.webp"); --card-fade: #f1e9dd; }
+.theme-romance { --card-img: url("../images/themes/romance-light.webp"); --card-fade: #e7bea3; --card-pos: calc(100% + 100px) center; }
+.theme-adventure { --card-img: url("../images/themes/adventure-light.webp"); --card-fade: #e2dcd2; }
 
-/* Scene palettes: light = warm daylight, dark = dusk in the cinema. */
-:root {
-    --ill-a: #e3ebee;
-    --ill-b: #f2efe4;
-    --ill-c: #f3e1c2;
-    --ill-cloud: #ffffff;
-    --ill-far: #c9d3d6;
-    --ill-near: #d6c29e;
-    --ill-mountain: #9fb3c4;
-    --ill-steam: #ffffff;
-    --ill-window: #fbf6ec;
-    --ill-star: transparent;
-    --ill-silhouette: #4a2a2a;
-}
-
-.theme-animals { --ill-a: #dbe7ee; --ill-b: #eef1ea; --ill-c: #f2e3c6; --ill-far: #c2d0b8; --ill-near: #a9bb8f; }
-.theme-cooking { --ill-a: #f4ead8; --ill-b: #efe1c8; --ill-c: #e6d0aa; --ill-far: #d9c19a; --ill-window: #f8eedc; }
-.theme-friendship { --ill-a: #f3e2c9; --ill-b: #f4cd9f; --ill-c: #eda36a; --ill-cloud: #fdf0de; --ill-far: #d79a6b; }
-.theme-ai { --ill-a: #c4d2df; --ill-b: #d5dfe8; --ill-c: #e3e8ea; --ill-far: #b3c3d3; }
-.theme-romance { --ill-a: #f6e4cf; --ill-b: #f4cdae; --ill-c: #eaa587; --ill-silhouette: #4a2228; }
-.theme-adventure { --ill-a: #cfdde8; --ill-b: #e4ebee; --ill-c: #f4ead8; --ill-far: #b6c6d3; --ill-mountain: #8ea5ba; }
-
-@media (prefers-color-scheme: dark) {
-    :root {
-            --ill-a: #131d31;
-        --ill-b: #1d2b45;
-        --ill-c: #2c3f62;
-        --ill-cloud: #34496d;
-        --ill-far: #22314d;
-        --ill-near: #1a2438;
-        --ill-mountain: #3a5274;
-        --ill-steam: #c3cfdf;
-        --ill-window: #2c3d5c;
-        --ill-star: #e9dcb8;
-        --ill-silhouette: #1a0f16;
-    }
-
-    .theme-animals { --ill-a: #142035; --ill-b: #22324f; --ill-c: #3a4c6c; --ill-far: #263852; --ill-near: #1b2a3c; }
-    .theme-cooking { --ill-a: #1a2234; --ill-b: #232e45; --ill-c: #2e3b56; --ill-far: #2a3550; --ill-window: #3b4d6e; }
-    .theme-friendship { --ill-a: #18243c; --ill-b: #4b4560; --ill-c: #d0844d; --ill-cloud: #b9714a; --ill-far: #34314a; }
-    .theme-ai { --ill-a: #0f182a; --ill-b: #172540; --ill-c: #213659; --ill-far: #1c2c48; }
-    .theme-romance { --ill-a: #241a2e; --ill-b: #45263a; --ill-c: #7a3436; --ill-silhouette: #160b12; }
-    .theme-adventure { --ill-a: #152238; --ill-b: #22344f; --ill-c: #42577a; --ill-far: #2a3c5a; --ill-mountain: #4a6488; }
-}
+:root[data-theme="dark"] .theme-animals { --card-img: url("../images/themes/animals-dark.webp"); --card-fade: #382d2c; --card-pos: calc(100% + 70px) center; }
+:root[data-theme="dark"] .theme-cooking { --card-img: url("../images/themes/cooking-dark.webp"); --card-fade: #1e252b; }
+:root[data-theme="dark"] .theme-friendship { --card-img: url("../images/themes/friendship-dark.webp"); --card-fade: #34343b; }
+:root[data-theme="dark"] .theme-ai { --card-img: url("../images/themes/ai-dark.webp"); --card-fade: #171f27; }
+:root[data-theme="dark"] .theme-romance { --card-img: url("../images/themes/romance-dark.webp"); --card-fade: #35242b; --card-pos: right center; }
+:root[data-theme="dark"] .theme-adventure { --card-img: url("../images/themes/adventure-dark.webp"); --card-fade: #323a43; }
 
 /* ---------- Results and compare ---------- */
 
@@ -736,8 +681,8 @@ html:lang(zh-Hant) .hero-compare-note {
     border-bottom-left-radius: 40px;
 }
 
-@media (prefers-color-scheme: dark) and (min-width: 1280px) {
-    .curtain {
+@media (min-width: 1280px) {
+    :root[data-theme="dark"] .curtain {
         display: block;
     }
 }
@@ -750,7 +695,11 @@ html:lang(zh-Hant) .hero-compare-note {
     opacity: 0.6;
 }
 
-@media (prefers-color-scheme: dark), (max-width: 1279px) {
+:root[data-theme="dark"] .decor-reel {
+    display: none;
+}
+
+@media (max-width: 1279px) {
     .decor-reel {
         display: none;
     }
@@ -1407,7 +1356,7 @@ html:lang(zh-Hant) .hero-compare-note {
         font-size: 22px;
     }
 
-    .lang-menu {
+    .header-tools {
         grid-area: lang;
     }
 
