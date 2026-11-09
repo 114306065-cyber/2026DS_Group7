@@ -594,7 +594,7 @@ html:lang(zh-Hant) .hero-compare-note {
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 18px;
-    background: var(--card-fade, var(--surface)) var(--card-img, none) right center / cover no-repeat;
+    background: var(--card-fade, var(--surface)) var(--card-img, none) var(--card-pos, right center) / cover no-repeat;
     box-shadow: var(--shadow);
     text-decoration: none;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -613,7 +613,7 @@ html:lang(zh-Hant) .hero-compare-note {
     font-size: clamp(24px, 2.6vw, 32px);
     font-style: var(--theme-name-style);
     font-weight: 700;
-    text-shadow: 0 1px 0 color-mix(in srgb, var(--card-fade) 70%, transparent), 0 2px 14px color-mix(in srgb, var(--card-fade) 90%, transparent);
+    text-shadow: 0 1px 0 color-mix(in srgb, var(--card-fade) 70%, transparent), 0 0 10px color-mix(in srgb, var(--card-fade) 95%, transparent), 0 0 22px color-mix(in srgb, var(--card-fade) 80%, transparent);
 }
 
 /* Fade the left side of the artwork into a solid colour so the theme name stays readable. */
@@ -621,7 +621,7 @@ html:lang(zh-Hant) .hero-compare-note {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--card-fade) 92%, transparent) 0%, color-mix(in srgb, var(--card-fade) 70%, transparent) 30%, color-mix(in srgb, var(--card-fade) 25%, transparent) 50%, transparent 64%);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--card-fade) 85%, transparent) 0%, color-mix(in srgb, var(--card-fade) 50%, transparent) 22%, color-mix(in srgb, var(--card-fade) 12%, transparent) 38%, transparent 50%);
     pointer-events: none;
 }
 
@@ -640,18 +640,18 @@ html:lang(zh-Hant) .hero-compare-note {
 }
 
 /* Artwork per theme: --card-img is the picture, --card-fade is the average colour of its left side. */
-.theme-animals { --card-img: url("../images/themes/animals-light.webp"); --card-fade: #d8d4c1; }
+.theme-animals { --card-img: url("../images/themes/animals-light.webp"); --card-fade: #d8d4c1; --card-pos: calc(100% + 100px) center; }
 .theme-cooking { --card-img: url("../images/themes/cooking-light.webp"); --card-fade: #e6d2b0; }
 .theme-friendship { --card-img: url("../images/themes/friendship-light.webp"); --card-fade: #d3c9c0; }
 .theme-ai { --card-img: url("../images/themes/ai-light.webp"); --card-fade: #f1e9dd; }
-.theme-romance { --card-img: url("../images/themes/romance-light.webp"); --card-fade: #e7bea3; }
+.theme-romance { --card-img: url("../images/themes/romance-light.webp"); --card-fade: #e7bea3; --card-pos: calc(100% + 100px) center; }
 .theme-adventure { --card-img: url("../images/themes/adventure-light.webp"); --card-fade: #e2dcd2; }
 
-:root[data-theme="dark"] .theme-animals { --card-img: url("../images/themes/animals-dark.webp"); --card-fade: #382d2c; }
+:root[data-theme="dark"] .theme-animals { --card-img: url("../images/themes/animals-dark.webp"); --card-fade: #382d2c; --card-pos: calc(100% + 70px) center; }
 :root[data-theme="dark"] .theme-cooking { --card-img: url("../images/themes/cooking-dark.webp"); --card-fade: #1e252b; }
 :root[data-theme="dark"] .theme-friendship { --card-img: url("../images/themes/friendship-dark.webp"); --card-fade: #34343b; }
 :root[data-theme="dark"] .theme-ai { --card-img: url("../images/themes/ai-dark.webp"); --card-fade: #171f27; }
-:root[data-theme="dark"] .theme-romance { --card-img: url("../images/themes/romance-dark.webp"); --card-fade: #35242b; }
+:root[data-theme="dark"] .theme-romance { --card-img: url("../images/themes/romance-dark.webp"); --card-fade: #35242b; --card-pos: right center; }
 :root[data-theme="dark"] .theme-adventure { --card-img: url("../images/themes/adventure-dark.webp"); --card-fade: #323a43; }
 
 /* ---------- Results and compare ---------- */
