@@ -6,12 +6,12 @@
 
     <main>
         <section class="hero">
-            <svg th:replace="~{illustrations :: operaFacade}"></svg>
-            <svg th:replace="~{illustrations :: banner}"></svg>
-            <svg th:replace="~{illustrations :: filmStrip}"></svg>
+            <img class="decor decor-left" th:src="@{/images/decor/facade-light.webp}" src="/images/decor/facade-light.webp" alt="" loading="lazy" decoding="async">
+            <img class="decor decor-right" th:src="@{/images/decor/banner-light.webp}" src="/images/decor/banner-light.webp" alt="" loading="lazy" decoding="async">
+            <img class="decor decor-strip" th:src="@{/images/decor/strip-dark.webp}" src="/images/decor/strip-dark.webp" alt="" loading="lazy" decoding="async">
 
             <div class="hero-inner">
-                <svg th:replace="~{illustrations :: filmRibbon}"></svg>
+                <img class="film-ribbon" th:src="@{/images/decor/ribbon-light.webp}" src="/images/decor/ribbon-light.webp" alt="" loading="lazy" decoding="async">
                 <h1 class="hero-title">MovieFinder</h1>
                 <p class="hero-tagline"><span th:text="#{home.tagline}">Find movies by the themes you love</span></p>
                 <form th:replace="~{fragments :: searchForm('/search')}"></form>
@@ -32,7 +32,6 @@
                 <li th:each="t : ${ {'animals','cooking','friendship','ai','romance','adventure'} }">
                     <a class="theme-card" th:classappend="'theme-' + ${t}" th:href="@{/search(q=${t == 'ai' ? 'AI' : t})}">
                         <span class="theme-name" th:text="#{${'theme.' + t}}">Animals</span>
-                        <svg th:replace="~{illustrations :: __${t}__}"></svg>
                     </a>
                 </li>
             </ul>
