@@ -82,8 +82,17 @@ class SearchControllerTest {
     void aboutPageExplainsTheRanking() throws Exception {
         mvc.perform(get("/about"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("How ranking works")))
+                .andExpect(content().string(containsString("How search and ranking work")))
                 .andExpect(content().string(containsString("Tavily")));
+    }
+
+    @Test
+    void aboutPageInChineseShowsTheStepLabels() throws Exception {
+        mvc.perform(get("/about").param("lang", "zh"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("搜尋與排名方式")))
+                .andExpect(content().string(containsString("<strong>主題搜尋</strong>")))
+                .andExpect(content().string(containsString("國立政治大學｜115-1")));
     }
 
     @Test
