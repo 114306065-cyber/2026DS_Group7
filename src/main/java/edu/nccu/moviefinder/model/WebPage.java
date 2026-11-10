@@ -38,11 +38,15 @@ public class WebPage {
             return;
         }
 
+        HashMap<String, Integer> newCounts = new HashMap<>();
+        double newScore = 0.0;
         for (Keyword keyword : kws.getList()) {
             int count = counter.countKeyword(keyword.getName());
-            counts.put(keyword.getName(), count);
-            score += count * keyword.getWeight();
+            newCounts.put(keyword.getName(), count);
+            newScore += count * keyword.getWeight();
         }
+        counts = newCounts;
+        score = newScore;
     }
 
     public String getUrl() {
